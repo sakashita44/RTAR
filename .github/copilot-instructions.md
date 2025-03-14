@@ -11,7 +11,11 @@ Therefore, user needs you to explain structure of the code, frameworks and libra
 ### General text rules
 
 * Use `,` and `.` instead of `、` and `。` in Japanese
-* Don't use `ですます調` in Japanese and use direct speech
+* Don't use `ですます調` in Japanese and use direct speech, lile example below
+    * `~する` instead of `~します`
+    * `~できる` instead of `~することができます`
+    * `~参照` instead of `~参照する`, `~参照します`
+    * `~実行` instead of `~実行する`, `~実行します`
 
 ### Markdown rules
 
