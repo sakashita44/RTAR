@@ -1,6 +1,6 @@
 # 解析テンプレート学習ロードマップ
 
-このロードマップは研究者がプログラミングの専門家でなくても段階的に学習できるよう設計されている.
+このテンプレート使用にはこのドキュメント内に記載のスキルがあることが望ましい．
 各段階で必要なスキルと具体的な学習内容を説明する.
 
 ## レベル1: 基礎知識の習得
@@ -81,6 +81,13 @@
 * SQL基礎とPandasとの連携
 * 大規模データの効率的な処理
 
+### データベース設計基礎
+
+* 正規化の基本概念（重複排除、依存関係の整理）
+* 研究データの論理構造の整理方法
+* 一対多、多対多関係の実装
+* 階層構造データの分割方法
+
 ## レベル4: 高度な分析と自動化
 
 より高度な分析手法と自動化技術を学ぶ.
@@ -102,26 +109,6 @@
 * Pytest による単体テスト
 * Black, Flake8 によるコード品質管理
 * ドキュメント作成の習慣化
-
-## 学習リソース
-
-### 初心者向け
-
-* **Git**: <https://git-scm.com/book/ja/v2/使い始める-バージョン管理とは>
-* **Python**: <https://www.python.jp/train/index.html>
-* **Docker**: <https://docs.docker.jp/get-started/overview.html>
-* **VS Code**: <https://azure.microsoft.com/ja-jp/products/visual-studio-code/getting-started>
-
-### 中級者向け
-
-* **データ分析**: <https://www.kaggle.com/learn/pandas>
-* **Jupyter**: <https://jupyter.org/try>
-* **可視化**: <https://matplotlib.org/stable/tutorials/index.html>
-
-### 上級者向け
-
-* **DVC**: <https://dvc.org/doc/start>
-* **研究再現性**: <https://the-turing-way.netlify.app/reproducible-research/reproducible-research.html>
 
 ## 実践的なアプローチ
 
