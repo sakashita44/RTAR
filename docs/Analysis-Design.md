@@ -131,6 +131,7 @@ analysis-template/
 │   └── dag_images/         # DAG画像
 ├── preprocess.dvc          # DVCステージ
 ├── dvc.yaml                # DVC設定ファイル
+├── dvc_stages/             # DVCステージファイル
 ├── README.md               # プロジェクトの概要
 ...                         # その他のディレクトリ
 ```
@@ -164,8 +165,8 @@ analysis-template/
     * `PROCESS_OVERVIEW.md` - 処理経路の概要をDAG画像とともに記載する.
     * `VERSION_MAPPING.md` - 各バージョンがどのデータやプロセスに対応しているか記録する.
     * `dag_images/` - DAG画像を保管する専用ディレクトリ.
-* `preprocess.dvc` - DVCステージ(パイプライン)の設定ファイル.
 * `dvc.yaml` - DVCの設定ファイル.
+* `dvc_stages/` - DVCステージファイルを管理するディレクトリ. 実際のステージの階層構造を反映.
 * `README.md` - プロジェクトの概要を記載したファイル.
 
 ## データ管理とバージョン管理

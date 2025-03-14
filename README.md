@@ -60,8 +60,8 @@ analysis-template/
 │   ├── PROCESS_OVERVIEW.md # 処理経路の概要
 │   ├── VERSION_MAPPING.md  # バージョン対応ドキュメント
 │   └── dag_images/         # DAG画像
-├── preprocess.dvc          # DVCステージ
 ├── dvc.yaml                # DVC設定ファイル
+├── dvc_stages/              # DVCステージファイル
 ├── README.md               # プロジェクトの概要
 ...                         # その他のディレクトリ
 ```
