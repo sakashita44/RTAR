@@ -32,3 +32,13 @@ Therefore, user needs you to explain structure of the code, frameworks and libra
 * Don't use meanless headings
 * Add back quotes for code and names
 * Use 4 spaces for tab
+
+### Git rules
+
+* Add prefix below for commit message
+    * `feat:` for new features
+    * `fix:` for bug fixes
+    * `refactor:` for code refactoring including formatting and style changes
+    * `test:` for adding or modifying tests
+    * `docs:` for documentation changes
+    * `chore:` for changes to the build process or auxiliary tools and libraries such as documentation generation
