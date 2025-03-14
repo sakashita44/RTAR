@@ -31,12 +31,13 @@
 ```text
 analysis-template/
 ├── data/
+|   ├── dvc_repo/           # DVCリモートリポジトリ
 │   ├── raw/                # 生データ
 │   ├── processed/          # 加工データ
 │   └── analysis/           # 解析データ
 ├── params/                 # パラメータファイル
-│   ├── preprocessing.yaml  # 前処理パラメータ
-│   └── analysis.yaml       # 解析パラメータ
+|   ├── preprocessing.yaml  # 前処理パラメータ
+|   └── analysis.yaml       # 解析パラメータ
 ├── exploratory/            # 試行錯誤用Notebook
 │   ├── preprocessing/      # データ前処理用Notebook
 │   └── analysis/           # 解析(統計解析等)用Notebook
@@ -46,10 +47,11 @@ analysis-template/
 ├── scripts/                # スクリプト
 │   ├── preprocessing/      # データ前処理スクリプト
 │   ├── analysis/           # 解析スクリプト
-│   └── common/             # 共通処理ファイル
+│   ├── common/             # 共通処理ファイル
+|   └── misc/               # その他のスクリプト
 ├── env/                    # 仮想環境関連ファイル
 │   ├── Dockerfile
-│   ├── requirements.txt
+|   ├── requirements.txt
 │   └── analysis.code-profile
 ├── docs/                   # ドキュメント
 │   ├── INSTALL.md          # インストール手順
@@ -61,6 +63,7 @@ analysis-template/
 ├── preprocess.dvc          # DVCステージ
 ├── dvc.yaml                # DVC設定ファイル
 ├── README.md               # プロジェクトの概要
+...                         # その他のディレクトリ
 ```
 
 ## インストール方法
