@@ -1,0 +1,43 @@
+# .gitignore
+
+# dataディレクトリ内のデータファイル
+# 適宜追加
+data/**/*.csv
+data/**/*.json
+data/**/*.c3d
+
+# Python関連
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+
+# Jupyter Notebook関連
+.ipynb_checkpoints/
+
+# VS Code関連
+.vscode/
+*.code-workspace
+
+# 環境設定ファイル
+.env
+*.env
+
+# OS関連
+.DS_Store
+Thumbs.db
+
+# ログファイル
+*.log
+
+# その他
+.idea/
+*.iml
+*.swp
+*.swo

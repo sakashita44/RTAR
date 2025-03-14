@@ -1,0 +1,13 @@
+# .gitattributes
+
+# データファイルをDVCで管理
+data/**/*.csv filter=dvc
+data/**/*.json filter=dvc
+data/**/*.c3d filter=dvc
+
+# テキストファイルの改行コードを自動変換
+*.md text
+*.py text
+*.sh text
+*.yaml text
+*.yml text
