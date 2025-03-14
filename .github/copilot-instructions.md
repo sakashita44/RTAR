@@ -46,3 +46,18 @@ Therefore, user needs you to explain structure of the code, frameworks and libra
     * `test:` for adding or modifying tests
     * `docs:` for documentation changes
     * `chore:` for changes to the build process or auxiliary tools and libraries such as documentation generation
+
+### File and folder rules
+
+* Standardize file naming conventions as follows:
+    * Repository meta files: all uppercase (README.md, LICENSE, CONTRIBUTING.md, CHANGELOG.md)
+    * Project documents: Pascal case - first letter of each word capitalized (Setup.md, Workflow.md, LearningRoadmap.md)
+    * Tracking documents: all uppercase with underscores (PROCESS_OVERVIEW.md, VERSION_MAPPING.md)
+* Script file naming conventions:
+    * Use snake case (process_data.py, analyze_results.py)
+    * Start with a verb that represents the function (convert_raw_data.py, calculate_statistics.py)
+* Directory names:
+    * Use singular form and lowercase (script/, data/, report/)
+* Jupyter Notebook file names:
+    * Use snake case
+    * Add creation date as prefix (20240215_initial_analysis.ipynb)
