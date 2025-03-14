@@ -22,7 +22,6 @@ build/
 .ipynb_checkpoints/
 
 # VS Code関連
-.vscode/
 *.code-workspace
 
 # 環境設定ファイル
