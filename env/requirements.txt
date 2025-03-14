@@ -1,0 +1,33 @@
+# 自身の必要なライブラリを適宜追加のこと
+# データ解析の基本ライブラリ
+numpy==1.26.3         # 数値計算ライブラリ
+pandas==2.2.0         # データ操作・分析ライブラリ
+scipy==1.12.0         # 科学技術計算ライブラリ
+
+# 可視化ライブラリ
+matplotlib==3.8.2     # グラフ描画ライブラリ
+seaborn==0.13.1       # 統計データ可視化ライブラリ
+bamboolib==1.31.0     # GUIでデータ操作・可視化
+
+# Jupyter関連
+jupyter==1.0.0        # Jupyter環境一式
+ipykernel==6.29.0     # IPythonカーネル
+nbformat==5.9.2       # Notebookフォーマット
+nbconvert==7.14.1     # Notebook変換ツール
+nbstripout==0.6.1     # Notebook出力の削除ツール
+
+# データベース関連
+duckdb==0.2.10        # インメモリデータベース
+
+# データバージョン管理
+dvc==3.36.1           # Data Version Control
+
+# 開発支援ツール
+black==24.1.1         # コードフォーマッター
+flake8==7.0.0         # コードリンター
+pytest==8.0.0         # テストフレームワーク
+
+# その他の便利なツール
+tqdm==4.66.1          # プログレスバー表示
+pyyaml==6.0.1         # YAML処理
+python-dotenv==1.0.0  # 環境変数管理
