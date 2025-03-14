@@ -61,7 +61,7 @@ analysis-template/
 │   ├── VERSION_MAPPING.md  # バージョン対応ドキュメント
 │   └── dag_images/         # DAG画像
 ├── dvc.yaml                # DVC設定ファイル
-├── dvc_stages/              # DVCステージファイル
+├── dvc_stages/             # DVCステージファイル
 ├── README.md               # プロジェクトの概要
 ...                         # その他のディレクトリ
 ```
