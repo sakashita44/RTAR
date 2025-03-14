@@ -158,6 +158,45 @@ catch {
     Write-Host "✓ VS Code 拡張機能のインストールが完了しました" -ForegroundColor Green
 }
 
+# DVC リモート設定
+Write-Host "DVC リモートを設定しています..." -ForegroundColor Cyan
+
+# DVC のインストール確認
+try {
+    dvc --version | Out-Null
+    Write-Host "✓ DVC が見つかりました" -ForegroundColor Green
+}
+catch {
+    Write-Host "! DVC が見つかりません。仮想環境を有効化してインストールすることをお勧めします" -ForegroundColor Yellow
+    Write-Host "  .venv\Scripts\Activate.ps1 を実行後、pip install dvc でインストールできます" -ForegroundColor Yellow
+}
+
+# DVC リモートディレクトリの作成
+$dvcRepoPath = Join-Path -Path $projectRoot -ChildPath "data\dvc_repo"
+if (-not (Test-Path $dvcRepoPath)) {
+    New-Item -Path $dvcRepoPath -ItemType Directory -Force | Out-Null
+    Write-Host "✓ DVCリモート用ディレクトリを作成しました: $dvcRepoPath" -ForegroundColor Green
+}
+else {
+    Write-Host "✓ DVCリモート用ディレクトリが既に存在します: $dvcRepoPath" -ForegroundColor Green
+}
+
+# DVC リモート設定
+try {
+    dvc remote add -d local $dvcRepoPath
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "✓ DVCリモートを設定しました: $dvcRepoPath" -ForegroundColor Green
+    }
+    else {
+        Write-Host "! DVCリモートの設定に失敗しました。後で手動で設定してください" -ForegroundColor Yellow
+        Write-Host "  使用コマンド: dvc remote add -d local $dvcRepoPath" -ForegroundColor Yellow
+    }
+}
+catch {
+    Write-Host "! DVCリモートの設定に失敗しました。後で手動で設定してください" -ForegroundColor Yellow
+    Write-Host "  使用コマンド: dvc remote add -d local $dvcRepoPath" -ForegroundColor Yellow
+}
+
 Write-Host "`nセットアップが完了しました！" -ForegroundColor Cyan
 Write-Host "仮想環境を有効化するには以下のコマンドを実行してください:" -ForegroundColor Yellow
 if ($IsWindows) {

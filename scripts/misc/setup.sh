@@ -111,6 +111,30 @@ else
     echo -e "${GREEN}✓ VS Code 拡張機能のインストールが完了しました${NC}"
 fi
 
+# DVC リモート設定
+echo -e "${CYAN}DVC リモートを設定しています...${NC}"
+
+# DVC のインストール確認
+if command -v dvc &> /dev/null; then
+    echo -e "${GREEN}✓ DVC が見つかりました${NC}"
+else
+    echo -e "${YELLOW}! DVC が見つかりません。仮想環境を有効化してインストールすることをお勧めします${NC}"
+    echo -e "${YELLOW}  source .venv/bin/activate を実行後、pip install dvc でインストールできます${NC}"
+fi
+
+# DVC リモートディレクトリの作成
+DVC_REPO_PATH="${PROJECT_ROOT}/data/dvc_repo"
+mkdir -p "$DVC_REPO_PATH"
+echo -e "${GREEN}✓ DVCリモート用ディレクトリを作成しました: $DVC_REPO_PATH${NC}"
+
+# DVC リモート設定
+if dvc remote add -d local "$DVC_REPO_PATH" 2>/dev/null; then
+    echo -e "${GREEN}✓ DVCリモートを設定しました: $DVC_REPO_PATH${NC}"
+else
+    echo -e "${YELLOW}! DVCリモートの設定に失敗しました。後で手動で設定してください${NC}"
+    echo -e "${YELLOW}  使用コマンド: dvc remote add -d local $DVC_REPO_PATH${NC}"
+fi
+
 echo -e "\n${CYAN}セットアップが完了しました！${NC}"
 echo -e "${YELLOW}仮想環境を有効化するには以下のコマンドを実行してください:${NC}"
 echo -e "source .venv/bin/activate"
