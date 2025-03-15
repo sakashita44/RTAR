@@ -70,11 +70,14 @@ analysis-template/
 
 ## インストール方法
 
-詳細なインストール手順は [docs/Install.md](docs/Install.md) を参照．
+詳細なインストール手順は [docs/Setup.md](docs/Setup.md) を参照．
 
 ## 使用方法
 
-詳細な使用方法は [docs/Usage.md](docs/Usage.md) を参照．
+ワークフローの詳細は [docs/Workflow.md](docs/Workflow.md) を参照．
+設計思想については [docs/Design.md](docs/Design.md) を参照．
+各種コマンドについては [docs/Commands.md](docs/Commands.md) を参照．
+学習ロードマップについては [docs/LearningRoadmap.md](docs/LearningRoadmap.md) を参照．
 
 ## ライセンス
 
