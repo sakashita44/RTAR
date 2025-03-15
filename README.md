@@ -68,9 +68,9 @@ analysis-template/
 ...                         # その他のディレクトリ
 ```
 
-## インストール方法
+## セットアップ方法
 
-詳細なインストール手順は [docs/Setup.md](docs/Setup.md) を参照．
+詳細なセットアップ手順は [docs/Setup.md](docs/Setup.md) を参照．
 
 ## 使用方法
 
