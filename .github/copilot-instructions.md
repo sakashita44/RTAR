@@ -20,6 +20,7 @@ Therefore, user needs you to explain structure of the code, frameworks and libra
 ### Markdown rules
 
 * Follow the markdown rules (markdownlint)
+* Appearance of the text in the text editor is not important. Follow the markdown rules.
 * Use `*` for lists
 * Use `1.` for ordered lists continuously
     * Don't use `2.` after `1.`
