@@ -1,0 +1,7 @@
+{
+    "remote": {
+        "url": "data/dvc_repo",
+        "_url": "Use relative path to workspace root or absolute path.",
+        "name": "origin"
+    }
+}

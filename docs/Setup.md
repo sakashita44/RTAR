@@ -11,10 +11,12 @@
     * [自動セットアップの手順](#自動セットアップの手順)
     * [手動セットアップの手順](#手動セットアップの手順)
         * [1. リポジトリのクローン](#1-リポジトリのクローン)
-        * [2. ディレクトリ構造の生成](#2-ディレクトリ構造の生成)
-        * [3. Dockerコンテナの作成](#3-dockerコンテナの作成)
-        * [4. VS Codeプロフィールの設定](#4-vs-codeプロフィールの設定)
-        * [5. Dev Container設定](#5-dev-container設定)
+        * [2. 設定ファイルの確認と修正](#2-設定ファイルの確認と修正)
+        * [3. ディレクトリ構造の生成](#3-ディレクトリ構造の生成)
+        * [4. Dockerコンテナの作成](#4-dockerコンテナの作成)
+        * [5. DVCの初期化](#5-dvcの初期化)
+        * [6. VS Codeプロフィールの設定](#6-vs-codeプロフィールの設定)
+        * [7. Dev Container設定](#7-dev-container設定)
     * [解析環境の使用](#解析環境の使用)
     * [トラブルシューティング](#トラブルシューティング)
 
@@ -44,13 +46,19 @@
 自動セットアップを行う場合は, 以下のステップで実行する:
 
 1. リポジトリをクローン
+1. 設定ファイルを確認・修正
 1. セットアップスクリプトを実行
-1. VS Codeでワークスペースを開き，Dev Containerで解析を開始
+1. VS Codeでワークスペースを開き, Dev Containerで解析を開始
 
 ```bash
 # リポジトリのクローン
 git clone https://github.com/yourusername/analysis-template.git
 cd analysis-template
+
+# 設定ファイルの確認と修正
+# - env/python.json: Pythonバージョンとイメージの設定
+# - env/requirements.txt: 必要なPythonパッケージを設定 (解析途中でも修正可能)
+# - env/dvc.json: DVCリモートの設定
 
 # セットアップスクリプトの実行 (Windowsの場合)
 .\scripts\misc\setup.ps1
@@ -80,7 +88,18 @@ git clone https://github.com/yourusername/analysis-template.git
 cd analysis-template
 ```
 
-### 2. ディレクトリ構造の生成
+### 2. 設定ファイルの確認と修正
+
+次に, 設定ファイルを確認し必要に応じて修正する.
+
+```bash
+# 設定ファイルの確認と修正
+# - env/python.json: Pythonバージョンとイメージの設定
+# - env/requirements.txt: 必要なPythonパッケージを設定 (解析途中でも修正可能)
+# - env/dvc.json: DVCリモートの設定
+```
+
+### 3. ディレクトリ構造の生成
 
 次に, 解析に必要なディレクトリ構造を生成する. これには自動生成スクリプトを使用する.
 
@@ -109,7 +128,7 @@ bash scripts/misc/gen_structure.sh
 * `params/`: パラメータファイル用
 * `info/`: プロジェクト情報用
 
-### 3. Dockerコンテナの作成
+### 4. Dockerコンテナの作成
 
 ディレクトリ構造が生成できたら, Dockerfileをビルドしてコンテナを作成する.
 
@@ -120,7 +139,17 @@ docker build -t analysis-env -f env/Dockerfile .
 
 このコンテナで使用するPythonイメージは `env/python.json` で指定されており, コンテナ内で使用するPythonライブラリは `env/requirements.txt` で指定されている.
 
-### 4. VS Codeプロフィールの設定
+### 5. DVCの初期化
+
+次に, DVCを初期化する.
+
+```bash
+# DVCの初期化
+dvc init
+dvc remote add -d myremote /path/to/remote/storage
+```
+
+### 6. VS Codeプロフィールの設定
 
 Dockerコンテナが作成できたら, VS Codeのプロフィールを設定する.
 
@@ -131,7 +160,7 @@ code --profile-import env/rtar.code-profile
 
 これにより, 解析に適した拡張機能や設定が自動的にVS Codeに適用される.
 
-### 5. Dev Container設定
+### 7. Dev Container設定
 
 VS Codeで開発コンテナを使用するには, `.devcontainer`ディレクトリが必要である. このディレクトリはリポジトリに含まれているため, 特別な設定は不要である.
 
