@@ -72,6 +72,8 @@
 * VS Code
     * プログラミング，デバッグ，コード管理
     * profileを使って設定を共有
+    * DevContainerで環境構築
+    * 拡張機能でDVCやJupyter Notebookを使用
 * Jupyter Notebook
     * 初期段階の加工の試行錯誤と記録
     * nbstripoutで不要メタデータやセル出力の除去
@@ -193,8 +195,8 @@ analysis-template/
 
 ### ローカル環境の汚染防止
 
-* `Docker`を用いて環境を分離
-* 共通処理（Git, DVCなど）をコンテナ内に集約し，作業環境をマウント
+* `Docker`を用いてPythonとpipでインストールするツールの環境を分離
+* ホスト環境にはDockerとGit, VS Code以外のインストールを不要にする
 
 ### 初期セットアップの簡略化
 
@@ -219,7 +221,7 @@ analysis-template/
 ### 可視化
 
 * Matplotlib, Seaborn, Plotly等で解析結果を可視化
-* 論文や発表用など用途別にスクリプトを分ける
+* 論文や発表用など用途別にNotebookを作成
 
 ## データアクセスと管理
 
