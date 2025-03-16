@@ -1,4 +1,4 @@
-# データ解析テンプレート設計書（Design3）
+# データ解析テンプレート設計書
 
 ## 概要と目的
 
@@ -14,6 +14,9 @@
 
 階層構造データを扱うデータ解析を前提とし，以下のツール，言語，ライブラリを使用することで，データ解析の効率化と再現性向上を図る．
 これらのツールを使用しないユーザは対象外 (ただし本テンプレートを参考にする等を制限するものではない)．
+なお，クリーンアーキテクチャの概念に基づき，本テンプレートはデータ解析のフレームワークを提供するものであるため，
+異なるツールやライブラリを使用する場合は，本テンプレートを参考にして適切な設計を行うことが望ましい．
+また，データ解析の手法等についても本テンプレートは提供しない．
 
 * VS Code
     * 豊富な拡張機能を活用して他ツールとの連携を図る
@@ -102,40 +105,44 @@
 ```text
 analysis-template/
 ├── data/
-|   ├── dvc_repo/           # DVCリモートリポジトリ
-│   ├── raw/                # 生データ
-│   ├── processed/          # 加工データ
-│   └── analysis/           # 解析データ
-├── params/                 # パラメータファイル
-|   ├── preprocessing.yaml  # 前処理パラメータ
-|   └── analysis.yaml       # 解析パラメータ
-├── exploratory/            # 試行錯誤用Notebook
-│   ├── preprocessing/      # データ前処理用Notebook
-│   └── analysis/           # 解析(統計解析等)用Notebook
-├── reports/                # レポート用Notebookとスクリプト
-│   ├── notebooks/          # レポート用Notebook
-│   └── common/             # レポート用共通スクリプト
-├── scripts/                # スクリプト
-│   ├── preprocessing/      # データ前処理スクリプト
-│   ├── analysis/           # 解析スクリプト
-│   ├── common/             # 共通処理ファイル
-|   └── misc/               # その他のスクリプト
-├── env/                    # 仮想環境関連ファイル
-│   ├── Dockerfile
-|   ├── requirements.txt
-│   └── analysis.code-profile
-├── docs/                   # ドキュメント
-│   ├── INSTALL.md          # インストール手順
-│   └── USAGE.md            # 使用方法
-├── info/                   # 確認の必要なファイル
-│   ├── PROCESS_OVERVIEW.md # 処理経路の概要
-│   ├── VERSION_MAPPING.md  # バージョン対応ドキュメント
-│   └── dag_images/         # DAG画像
-├── preprocess.dvc          # DVCステージ
-├── dvc.yaml                # DVC設定ファイル
-├── dvc_stages/             # DVCステージファイル
-├── README.md               # プロジェクトの概要
-...                         # その他のディレクトリ
+|   ├── dvc_repo/             # DVCリモートリポジトリ
+│   ├── raw/                  # 生データ
+│   ├── processed/            # 加工データ
+│   └── analysis/             # 解析データ
+├── params/                   # パラメータファイル
+|   ├── preprocessing.yaml    # 前処理パラメータ
+|   └── analysis.yaml         # 解析パラメータ
+├── exploratory/              # 試行錯誤用Notebook
+│   ├── preprocessing/        # データ前処理用Notebook
+│   └── analysis/             # 解析(統計解析等)用Notebook
+├── reports/                  # レポート用Notebookとスクリプト
+│   ├── notebooks/            # レポート用Notebook
+│   └── common/               # レポート用共通スクリプト
+├── scripts/                  # スクリプト
+│   ├── preprocessing/        # データ前処理スクリプト
+│   ├── analysis/             # 解析スクリプト
+│   ├── common/               # 共通処理ファイル
+|   ├── interface/            # データベース接続スクリプト
+|   └── misc/                 # その他のスクリプト
+├── data_structure            # データの構造定義
+|   ├── data_structure.yaml   # data/のデータ構造定義
+|   └── entity_relation.yaml  # ER定義
+├── env/                      # 仮想環境関連ファイル
+│   ├── Dockerfile            # Docker設定ファイル
+|   ├── requirements.txt      # Pythonパッケージ依存関係
+│   └── analysis.code-profile # VS Codeの設定ファイル
+├── docs/                     # ドキュメント
+│   ├── INSTALL.md            # インストール手順
+│   └── USAGE.md              # 使用方法
+├── info/                     # 確認の必要なファイル
+│   ├── PROCESS_OVERVIEW.md   # 処理経路の概要
+│   ├── VERSION_MAPPING.md    # バージョン対応ドキュメント
+│   └── dag_images/           # DAG画像
+├── preprocess.dvc            # DVCステージ
+├── dvc.yaml                  # DVC設定ファイル
+├── dvc_stages/               # DVCステージファイル
+├── README.md                 # プロジェクトの概要
+...                           # その他のディレクトリ
 ```
 
 ## ディレクトリ詳細
@@ -158,7 +165,11 @@ analysis-template/
     * `preprocessing/` - 生データの前処理スクリプトを配置する.
     * `analysis/` - 統計解析等の処理スクリプトを配置する.
     * `common/` - 複数の処理で再利用可能な共通関数を格納する.
+    * `interface/` - データベース接続スクリプトを格納する.
     * `misc/` - gitやDVCの操作, セットアップスクリプトなど，その他のスクリプトを格納する.
+* `data_models/` - データの構造定義を管理するディレクトリ.
+    * `data_structure.yaml` - `data/`のデータ構造定義を記載するファイル.
+    * `entity_relation.yaml` - ERの定義を記載するファイル.
 * `env/` - 仮想環境や依存ライブラリの設定ファイルを管理するディレクトリ.
     * `Dockerfile` - コンテナ環境構築用の設定ファイル.
     * `requirements.txt` - Pythonパッケージの依存関係を記載するファイル.
@@ -229,7 +240,7 @@ analysis-template/
 
 * 被験者 > 試行 > データといった構造的情報をDuckDBで管理
     * リレーショナルデータベースを用いて階層構造を管理
-    * データ加工はpandasで行い，DuckDBに格納等
+        * データ加工はpandasで行い，DuckDBに格納等
 
 ### 前提条件とチェック
 
@@ -292,6 +303,11 @@ analysis-template/
 解析結果を元にグラフ化やその他出力を実施する
 
 * ドキュメント更新: 出力方法と結果の概要を記録する
+
+## 拡張可能性
+
+* 実験の設計とデータ取得の規格化
+    * データ取得の際のメタデータを記録し，データ取得のプロセスを再現可能にする
 
 ## 結論
 
