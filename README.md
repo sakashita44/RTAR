@@ -50,19 +50,23 @@ analysis-template/
 │   ├── preprocessing/        # データ前処理スクリプト
 │   ├── analysis/             # 解析スクリプト
 │   ├── common/               # 共通処理ファイル
-│   ├── interface/            # インターフェーススクリプト
+|   ├── interface/            # インターフェーススクリプト
 |   └── misc/                 # その他のスクリプト
 ├── schema/                   # データの構造定義
 |   ├── data_structure.yaml   # data/のデータ構造定義
 |   └── entity_relation.yaml  # ER定義
 ├── env/                      # 仮想環境関連ファイル
-│   ├── Dockerfile
-|   ├── requirements.txt
-│   └── analysis.code-profile
+│   ├── Dockerfile            # Docker設定ファイル
+|   ├── requirements.txt      # Pythonパッケージ依存関係
+│   └── analysis.code-profile # VS Codeの設定ファイル
 ├── docs/                     # ドキュメント
-│   ├── INSTALL.md            # インストール手順
-│   └── USAGE.md              # 使用方法
+│   ├── Design.md             # デザインドキュメント
+│   ├── Workflow.md           # ワークフロードキュメント
+│   ├── Setup.md              # セットアップドキュメント
+|   ├── DocumentationRules.md # ドキュメント記述ルール
+|   └── LearningRoadmap.md    # 学習ロードマップ
 ├── info/                     # 確認の必要なファイル
+|   ├── DATA_REQUIREMENTS.md  # データ要件定義文書
 │   ├── PROCESS_OVERVIEW.md   # 処理経路の概要
 │   ├── VERSION_MAPPING.md    # バージョン対応ドキュメント
 │   └── dag_images/           # DAG画像
