@@ -6,6 +6,11 @@ User is not professional of the programming and programming related frameworks.
 User is researcher and want to improve the research by using the programming and programming related frameworks.
 Therefore, user needs you to explain structure of the code, frameworks and libraries in detail and simple terms.
 
+## General instructions
+
+* If you asked to generate the code, please generate the code.
+* It is not necessary to generate the code, until user asks for it.
+
 ## Code and documentation rules
 
 ### General text rules
