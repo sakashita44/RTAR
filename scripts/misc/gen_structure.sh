@@ -68,23 +68,6 @@ for file in "${!infoFiles[@]}"; do
     fi
 done
 
-# サンプルデータの作成
-sample_data_dir="data/raw/sample"
-if [ ! -d "$sample_data_dir" ]; then
-    mkdir -p "$sample_data_dir"
-
-    # サンプルCSVデータの作成
-    cat > "$sample_data_dir/data.csv" << EOF
-id,name,value
-1,item1,10.5
-2,item2,20.3
-3,item3,15.7
-4,item4,30.1
-5,item5,25.9
-EOF
-    echo -e " + ${GREEN}$sample_data_dir/data.csv${NC} (サンプルデータ)"
-fi
-
 # DVCの設定ファイルを作成
 if [ ! -f "env/dvc.json" ]; then
     cat > "env/dvc.json" << EOF
