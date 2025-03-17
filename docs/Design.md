@@ -122,9 +122,9 @@ analysis-template/
 │   ├── preprocessing/        # データ前処理スクリプト
 │   ├── analysis/             # 解析スクリプト
 │   ├── common/               # 共通処理ファイル
-|   ├── interface/            # データベース接続スクリプト
+|   ├── interface/            # インターフェーススクリプト
 |   └── misc/                 # その他のスクリプト
-├── data_structure            # データの構造定義
+├── schema/                   # データの構造定義
 |   ├── data_structure.yaml   # data/のデータ構造定義
 |   └── entity_relation.yaml  # ER定義
 ├── env/                      # 仮想環境関連ファイル
@@ -165,9 +165,9 @@ analysis-template/
     * `preprocessing/` - 生データの前処理スクリプトを配置する.
     * `analysis/` - 統計解析等の処理スクリプトを配置する.
     * `common/` - 複数の処理で再利用可能な共通関数を格納する.
-    * `interface/` - データベース接続スクリプトを格納する.
+    * `interface/` - データの読み込みや出力のラッパー関数を格納する.
     * `misc/` - gitやDVCの操作, セットアップスクリプトなど，その他のスクリプトを格納する.
-* `data_models/` - データの構造定義を管理するディレクトリ.
+* `schema/` - データの構造定義を管理するディレクトリ.
     * `data_structure.yaml` - `data/`のデータ構造定義を記載するファイル.
     * `entity_relation.yaml` - ERの定義を記載するファイル.
 * `env/` - 仮想環境や依存ライブラリの設定ファイルを管理するディレクトリ.

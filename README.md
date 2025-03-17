@@ -33,39 +33,43 @@ MITライセンスの下で公開しており，本テンプレートの使用�
 ```text
 analysis-template/
 ├── data/
-|   ├── dvc_repo/           # DVCリモートリポジトリ
-│   ├── raw/                # 生データ
-│   ├── processed/          # 加工データ
-│   └── analysis/           # 解析データ
-├── params/                 # パラメータファイル
-|   ├── preprocessing.yaml  # 前処理パラメータ
-|   └── analysis.yaml       # 解析パラメータ
-├── exploratory/            # 試行錯誤用Notebook
-│   ├── preprocessing/      # データ前処理用Notebook
-│   └── analysis/           # 解析(統計解析等)用Notebook
-├── reports/                # レポート用Notebookとスクリプト
-│   ├── notebooks/          # レポート用Notebook
-│   └── common/             # レポート用共通スクリプト
-├── scripts/                # スクリプト
-│   ├── preprocessing/      # データ前処理スクリプト
-│   ├── analysis/           # 解析スクリプト
-│   ├── common/             # 共通処理ファイル
-|   └── misc/               # その他のスクリプト
-├── env/                    # 仮想環境関連ファイル
+|   ├── dvc_repo/             # DVCリモートリポジトリ
+│   ├── raw/                  # 生データ
+│   ├── processed/            # 加工データ
+│   └── analysis/             # 解析データ
+├── params/                   # パラメータファイル
+|   ├── preprocessing.yaml    # 前処理パラメータ
+|   └── analysis.yaml         # 解析パラメータ
+├── exploratory/              # 試行錯誤用Notebook
+│   ├── preprocessing/        # データ前処理用Notebook
+│   └── analysis/             # 解析(統計解析等)用Notebook
+├── reports/                  # レポート用Notebookとスクリプト
+│   ├── notebooks/            # レポート用Notebook
+│   └── common/               # レポート用共通スクリプト
+├── scripts/                  # スクリプト
+│   ├── preprocessing/        # データ前処理スクリプト
+│   ├── analysis/             # 解析スクリプト
+│   ├── common/               # 共通処理ファイル
+│   ├── interface/            # インターフェーススクリプト
+|   └── misc/                 # その他のスクリプト
+├── schema/                   # データの構造定義
+|   ├── data_structure.yaml   # data/のデータ構造定義
+|   └── entity_relation.yaml  # ER定義
+├── env/                      # 仮想環境関連ファイル
 │   ├── Dockerfile
 |   ├── requirements.txt
 │   └── analysis.code-profile
-├── docs/                   # ドキュメント
-│   ├── INSTALL.md          # インストール手順
-│   └── USAGE.md            # 使用方法
-├── info/                   # 確認の必要なファイル
-│   ├── PROCESS_OVERVIEW.md # 処理経路の概要
-│   ├── VERSION_MAPPING.md  # バージョン対応ドキュメント
-│   └── dag_images/         # DAG画像
-├── dvc.yaml                # DVC設定ファイル
-├── dvc_stages/             # DVCステージファイル
-├── README.md               # プロジェクトの概要
-...                         # その他のディレクトリ
+├── docs/                     # ドキュメント
+│   ├── INSTALL.md            # インストール手順
+│   └── USAGE.md              # 使用方法
+├── info/                     # 確認の必要なファイル
+│   ├── PROCESS_OVERVIEW.md   # 処理経路の概要
+│   ├── VERSION_MAPPING.md    # バージョン対応ドキュメント
+│   └── dag_images/           # DAG画像
+├── dvc.yaml                  # DVC設定ファイル
+├── dvc_stages/               # DVCステージファイル
+├── README.md                 # プロジェクトの概要
+...                           # その他のディレクトリ
 ```
 
 ## セットアップ方法
