@@ -84,7 +84,10 @@ Write-Host "`n[4/5] DVCを初期化" -ForegroundColor Cyan
 
 # .gitディレクトリを確認したうえで削除して再初期化
 if (Test-Path ".git") {
-    Write-Host "既存のGitリポジトリを削除して再初期化しますか? (y/n)" -ForegroundColor Yellow
+    Write-Host "既存のGitリポジトリを削除して再初期化しますか?" -ForegroundColor Yellow
+    Write-Host "※ 初回セットアップ時以外は実行しないでください." -ForegroundColor Yellow
+    Write-Host "※ Noを選択した場合.gitディレクトリは削除されずセットアップが続行されます." -ForegroundColor Yellow
+    Write-Host "※ (y/n)" -NoNewline
     $answer = Read-Host
     if ($answer -eq "y" -or $answer -eq "Y") {
         Write-Host "既存のGitリポジトリを削除" -ForegroundColor Yellow
