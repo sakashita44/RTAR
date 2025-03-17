@@ -43,11 +43,12 @@ fi
 
 # 不足ツールがある場合は終了
 if [ ${#missing_tools[@]} -gt 0 ]; then
-    echo -e "\n${RED}以下のツールがインストールされていない:${NC}"
+    echo -e "\n${RED}以下のツールが未インストール:${NC}"
     for tool in "${missing_tools[@]}"; do
         echo -e "${RED} - $tool${NC}"
     done
-    echo -e "\n${RED}セットアップを続行するには, これらのツールをインストールする.${NC}"
+    echo -e "\n${RED}自動セットアップを続行するには, これらのツールをインストールする必要があります.${NC}"
+    echo -e "${YELLOW}これらのツールを使用しない場合は手動でセットアップしてください.${NC}"
     exit 1
 fi
 
@@ -103,14 +104,23 @@ echo -e "${YELLOW}docker build --build-arg PYTHON_IMAGE=$pythonImage -t rtar-ana
 # 3. DVC初期化と設定
 echo -e "\n${CYAN}[4/5] DVCを初期化...${NC}"
 
+# .gitディレクトリを確認したうえで削除して再初期化
+if [ -d ".git" ]; then
+    read -p "既存のGitリポジトリを削除して再初期化しますか? (y/n): " answer
+    if [[ $answer == "y" || $answer == "Y" ]]; then
+        echo -e "${YELLOW}既存のGitリポジトリを削除${NC}"
+        rm -rf .git
+    fi
+fi
+
 # リポジトリが既にGit初期化されているか確認
 if [ ! -d ".git" ]; then
-    echo -e "${YELLOW}Gitリポジトリを初期化...${NC}"
+    echo -e "${YELLOW}Gitリポジトリを初期化${NC}"
     git init
 fi
 
 # DVC初期化（Docker内で実行）
-echo -e "${YELLOW}DVCリポジトリを初期化...${NC}"
+echo -e "${YELLOW}DVCリポジトリを初期化${NC}"
 docker run --rm -v $(pwd):/workspace -w /workspace rtar-analysis bash -c "pip install dvc && dvc init && dvc config core.autostage true"
 
 # DVC設定ファイルの読み込み

@@ -21,11 +21,12 @@ foreach ($tool in $prerequisites.Keys) {
 }
 
 if ($missing.Count -gt 0) {
-    Write-Host "`n以下のツールがインストールされていない:" -ForegroundColor Red
+    Write-Host "`n以下のツールが未インストール:" -ForegroundColor Red
     foreach ($tool in $missing) {
         Write-Host " - $tool" -ForegroundColor Red
     }
-    Write-Host "`nセットアップを続行するには, これらのツールをインストールする." -ForegroundColor Red
+    Write-Host "`n自動セットアップを続行するには, これらのツールをインストールする必要があります" -ForegroundColor Red
+    Write-Host "`nこれらのツールを使用しない場合は手動でセットアップしてください." -ForegroundColor Yellow
     exit 1
 }
 
@@ -80,6 +81,16 @@ Write-Host "docker build --build-arg PYTHON_IMAGE=$pythonImage -t rtar-analysis 
 
 # 3. DVC初期化と設定
 Write-Host "`n[4/5] DVCを初期化" -ForegroundColor Cyan
+
+# .gitディレクトリを確認したうえで削除して再初期化
+if (Test-Path ".git") {
+    Write-Host "既存のGitリポジトリを削除して再初期化しますか? (y/n)" -ForegroundColor Yellow
+    $answer = Read-Host
+    if ($answer -eq "y" -or $answer -eq "Y") {
+        Write-Host "既存のGitリポジトリを削除" -ForegroundColor Yellow
+        Remove-Item -Path ".git" -Recurse -Force
+    }
+}
 
 # リポジトリが既にGit初期化されているか確認
 if (-not (Test-Path ".git")) {
