@@ -88,6 +88,12 @@ git clone https://github.com/yourusername/analysis-template.git
 cd analysis-template
 ```
 
+クローン後，.gitディレクトリを削除することをお勧めする．これにより，リポジトリの履歴が削除され，新しいリポジトリとして使用できる．
+
+```bash
+rm -rf .git
+```
+
 ### 2. 設定ファイルの確認と修正
 
 次に, 設定ファイルを確認し必要に応じて修正する.
@@ -152,6 +158,8 @@ dvc remote add -d myremote /path/to/remote/storage
 ### 6. VS Codeプロフィールの設定
 
 Dockerコンテナが作成できたら, VS Codeのプロフィールを設定する.
+なお自身の好みのプロフィールを使用する場合は, `env/rtar.code-profile`を直接編集するか，
+.devcontainer/devcontainer.json内の`customizations` > `profile`を変更することで設定を変更できる.
 
 ```bash
 # VS Codeプロフィールの設定
