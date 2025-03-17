@@ -6,8 +6,18 @@ data/**/*.json filter=dvc
 data/**/*.c3d filter=dvc
 
 # テキストファイルの改行コードを自動変換
+*.txt text
 *.md text
 *.py text
 *.sh text
+*.ps1 text
+*.bat text
 *.yaml text
 *.yml text
+*.json text
+*.csv text
+
+*Dockerfile* text
+*LICENSE* text
+*.gitattributes* text
+*.gitignore* text
