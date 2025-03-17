@@ -82,10 +82,10 @@ analysis-template/
 
 ## 使用方法
 
-ワークフローの詳細は [docs/Workflow.md](docs/Workflow.md) を参照．
-設計思想については [docs/Design.md](docs/Design.md) を参照．
-各種コマンドについては [docs/Commands.md](docs/Commands.md) を参照．
-学習ロードマップについては [docs/LearningRoadmap.md](docs/LearningRoadmap.md) を参照．
+* ワークフローの詳細は [docs/Workflow.md](docs/Workflow.md) を参照．
+* 設計思想については [docs/Design.md](docs/Design.md) を参照．
+* 学習ロードマップについては [docs/LearningRoadmap.md](docs/LearningRoadmap.md) を参照．
+* `info/`以下のドキュメント記述ルールについては [docs/DocumentationRules.md](docs/DocumentationRules.md) を参照．
 
 ## ライセンス
 
