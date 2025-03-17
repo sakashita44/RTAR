@@ -22,26 +22,14 @@
 
 ### 要求データ定義時タスク
 
-* 生データの特性把握
-* 最終成果物（論文・発表）に必要なデータ項目の洗い出し
-* 生データから要求データへの変換に必要な中間データの特定
+* 以下の内容を`info/DATA_REQUIREMENTS.md`に記載 (`docs/DocumentationRules.md`に従う)
+    * 生データの特性把握
+    * 最終成果物（論文・発表）に必要なデータ項目の洗い出し
+    * 生データから要求データへの変換に必要な中間データの特定
 
 ### 要求データ定義の成果物
 
 * `info/DATA_REQUIREMENTS.md` - データ要件定義文書
-
-### 要求データ定義関連処理
-
-データの追跡
-
-```bash
-dvc add data/raw/example.csv
-dvc commit
-git add data/raw/example.csv.dvc
-git commit -m "feat: 生データ追加"
-git tag -a "v1.0" -m "生データ追加"
-git push origin v1.0
-```
 
 ## ステップ2: データ加工 (Preprocessing)
 
@@ -79,6 +67,14 @@ git push origin v1.0
 ### データ加工手順
 
 ```bash
+# 0. データの追跡
+dvc add data/raw/example.csv
+dvc commit
+git add data/raw/example.csv.dvc
+git commit -m "feat: 生データ追加"
+git tag -a "v1.0" -m "生データ追加"
+git push origin v1.0
+
 # 1. 探索的データ加工（Jupyter Notebook起動）
 jupyter notebook exploratory/preprocessing/notebook_name.ipynb
 
