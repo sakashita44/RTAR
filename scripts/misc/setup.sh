@@ -89,12 +89,16 @@ bash ./scripts/misc/gen_structure.sh
 # 2. Dockerコンテナのビルド
 echo -e "\n${CYAN}[3/5] Dockerコンテナをビルド...${NC}"
 
+# env/python.jsonを読み込む
+pythonConfig=$(cat env/python.json)
+pythonImage=$(echo $pythonConfig | jq -r '.dockerImage')
+
 # Dockerイメージのビルド
 echo -e "${YELLOW}Dockerイメージをビルド中...${NC}"
-docker build -t rtar-analysis -f env/Dockerfile env/
+docker build --build-arg PYTHON_IMAGE=$pythonImage -t rtar-analysis -f env/Dockerfile env/
 
 echo -e "${YELLOW}解析環境に変更が必要になった場合は, env/requirements.txt を編集し${NC}"
-echo -e "${YELLOW}docker build -t rtar-analysis -f env/Dockerfile env/ を実行することで更新可能です.${NC}"
+echo -e "${YELLOW}docker build --build-arg PYTHON_IMAGE=$pythonImage -t rtar-analysis -f env/Dockerfile env/ を実行することで更新可能です.${NC}"
 
 # 3. DVC初期化と設定
 echo -e "\n${CYAN}[4/5] DVCを初期化...${NC}"

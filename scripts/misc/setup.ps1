@@ -1,11 +1,5 @@
 # RTARテンプレート自動セットアップスクリプト (Windows用)
 
-# 管理者権限の確認
-if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Warning "管理者権限でこのスクリプトを実行することを推奨する"
-    Start-Sleep -Seconds 2
-}
-
 # 前提条件の確認
 $prerequisites = @{
     "Docker"  = { docker --version }
@@ -73,12 +67,16 @@ Write-Host "`n[2/5] ディレクトリ構造を生成" -ForegroundColor Cyan
 # 2. Dockerコンテナのビルド
 Write-Host "`n[3/5] Dockerコンテナをビルド" -ForegroundColor Cyan
 
+# env/python.jsonを読み込む
+$pythonConfig = Get-Content -Raw -Path "env/python.json" | ConvertFrom-Json
+$pythonImage = $pythonConfig.dockerImage
+
 # Dockerイメージのビルド
 Write-Host "Dockerイメージをビルド中..." -ForegroundColor Yellow
-docker build -t rtar-analysis -f env/Dockerfile env/
+docker build --build-arg PYTHON_IMAGE=$pythonImage -t rtar-analysis -f env/Dockerfile env/
 
 Write-Host "解析環境に変更が必要になった場合は, env/requirements.txt を編集し" -ForegroundColor Yellow
-Write-Host "docker build -t rtar-analysis -f env/Dockerfile env/ を実行することで更新可能です." -ForegroundColor Yellow
+Write-Host "docker build --build-arg PYTHON_IMAGE=$pythonImage -t rtar-analysis -f env/Dockerfile env/ を実行することで更新可能です." -ForegroundColor Yellow
 
 # 3. DVC初期化と設定
 Write-Host "`n[4/5] DVCを初期化" -ForegroundColor Cyan
