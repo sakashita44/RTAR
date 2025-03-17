@@ -1,1 +1,373 @@
-# リレーショナルデータベースのテーブル構造と関係性を定義する
+# リレーショナルデータベースのテーブル構造とリレーションシップを定義するファイル
+# Example
+# 以下のようなテーブル構造を想定
+# ```mermaid
+# erDiagram
+#     subjects ||--o{ trials : "has"
+#     trials ||--o{ raw_data : "has"
+#     trials ||--o{ preprocessed_data : "has"
+#     trials ||--o{ data_processing_logs : "has"
+#     raw_data_definitions ||--o{ raw_data : "defines"
+#     preprocessed_data_definitions ||--o{ preprocessed_data : "defines"
+
+#     subjects {
+#         int subject_id PK
+#         double body_height
+#         double body_mass
+#     }
+
+#     trials {
+#         int trial_id PK
+#         int subject_id FK
+#         int trial_sequence
+#         boolean is_available
+#         boolean condition_a
+#         boolean condition_b
+#     }
+
+#     raw_data_definitions {
+#         int raw_data_id PK
+#         text raw_data_name
+#         text unit
+#         text description
+#         timestamp created_at
+#     }
+
+#     preprocessed_data_definitions {
+#         int preprocessed_data_id PK
+#         text preprocessed_data_name
+#         text unit
+#         text description
+#         text processing_method
+#         timestamp created_at
+#     }
+
+#     raw_data {
+#         int trial_id PK,FK
+#         int frame PK
+#         int raw_data_id PK,FK
+#         double value
+#         boolean is_valid
+#     }
+
+#     preprocessed_data {
+#         int trial_id PK,FK
+#         int frame PK
+#         int preprocessed_data_id PK,FK
+#         double value
+#         boolean is_valid
+#     }
+
+#     data_processing_logs {
+#         int log_id PK
+#         int trial_id FK
+#         text processing_type
+#         text description
+#         timestamp processed_at
+#     }
+# ```
+# 以下のようなリレーションシップを定義
+# entities:
+#   - name: "subject"
+#     table_name: "subjects"
+#     description: "被験者情報"
+#     primary_key: "subject_id"
+#     attributes:
+#       - name: "subject_id"
+#         type: "INTEGER"
+#         description: "被験者ID"
+#         constraints: "PRIMARY KEY"
+#       - name: "body_height"
+#         type: "DOUBLE"
+#         description: "身長(m)"
+#       - name: "body_mass"
+#         type: "DOUBLE"
+#         description: "体重(kg)"
+#       - name: "created_at"
+#         type: "TIMESTAMP"
+#         description: "レコード作成日時"
+#         default: "CURRENT_TIMESTAMP"
+#     indexes:
+#       - name: "idx_subject_id"
+#         columns: ["subject_id"]
+#         unique: true
+
+#   - name: "trial"
+#     table_name: "trials"
+#     description: "実験の試行情報"
+#     primary_key: "trial_id"
+#     attributes:
+#       - name: "trial_id"
+#         type: "INTEGER"
+#         description: "試行ID"
+#         constraints: "PRIMARY KEY"
+#       - name: "subject_id"
+#         type: "INTEGER"
+#         description: "被験者ID"
+#         constraints: "NOT NULL"
+#       - name: "trial_sequence"
+#         type: "INTEGER"
+#         description: "被験者内における試行の順番"
+#       - name: "is_available"
+#         type: "BOOLEAN"
+#         description: "データが利用可能かどうか"
+#         default: true
+#       - name: "condition_a"
+#         type: "BOOLEAN"
+#         description: "条件Aの有無"
+#       - name: "condition_b"
+#         type: "BOOLEAN"
+#         description: "条件Bの有無"
+#       - name: "created_at"
+#         type: "TIMESTAMP"
+#         description: "レコード作成日時"
+#         default: "CURRENT_TIMESTAMP"
+#     foreign_keys:
+#       - name: "fk_trial_subject"
+#         columns: ["subject_id"]
+#         references:
+#           table: "subjects"
+#           columns: ["subject_id"]
+#         on_delete: "RESTRICT"
+#     indexes:
+#       - name: "idx_trial_subject"
+#         columns: ["subject_id"]
+#       - name: "idx_trial_conditions"
+#         columns: ["condition_a", "condition_b"]
+
+#   - name: "raw_data_definition"
+#     table_name: "raw_data_definitions"
+#     description: "生データの定義"
+#     primary_key: "raw_data_id"
+#     attributes:
+#       - name: "raw_data_id"
+#         type: "INTEGER"
+#         description: "生データID"
+#         constraints: "PRIMARY KEY"
+#       - name: "raw_data_name"
+#         type: "TEXT"
+#         description: "生データの名前"
+#         constraints: "NOT NULL"
+#       - name: "unit"
+#         type: "TEXT"
+#         description: "単位"
+#       - name: "description"
+#         type: "TEXT"
+#         description: "生データの説明"
+#       - name: "created_at"
+#         type: "TIMESTAMP"
+#         description: "レコード作成日時"
+#         default: "CURRENT_TIMESTAMP"
+#     indexes:
+#       - name: "idx_raw_data_name"
+#         columns: ["raw_data_name"]
+#         unique: true
+
+#   - name: "preprocessed_data_definition"
+#     table_name: "preprocessed_data_definitions"
+#     description: "前処理済みデータの定義"
+#     primary_key: "preprocessed_data_id"
+#     attributes:
+#       - name: "preprocessed_data_id"
+#         type: "INTEGER"
+#         description: "前処理済みデータID"
+#         constraints: "PRIMARY KEY"
+#       - name: "preprocessed_data_name"
+#         type: "TEXT"
+#         description: "前処理済みデータの名前"
+#         constraints: "NOT NULL"
+#       - name: "unit"
+#         type: "TEXT"
+#         description: "単位"
+#       - name: "description"
+#         type: "TEXT"
+#         description: "前処理済みデータの説明"
+#       - name: "processing_method"
+#         type: "TEXT"
+#         description: "前処理手法の説明"
+#       - name: "created_at"
+#         type: "TIMESTAMP"
+#         description: "レコード作成日時"
+#         default: "CURRENT_TIMESTAMP"
+#     indexes:
+#       - name: "idx_preprocessed_data_name"
+#         columns: ["preprocessed_data_name"]
+#         unique: true
+
+#   - name: "raw_data"
+#     table_name: "raw_data"
+#     description: "生の時系列データ"
+#     primary_key: ["trial_id", "frame", "raw_data_id"]
+#     attributes:
+#       - name: "trial_id"
+#         type: "INTEGER"
+#         description: "試行ID"
+#         constraints: "NOT NULL"
+#       - name: "frame"
+#         type: "INTEGER"
+#         description: "フレーム番号"
+#         constraints: "NOT NULL"
+#       - name: "raw_data_id"
+#         type: "INTEGER"
+#         description: "生データID"
+#         constraints: "NOT NULL"
+#       - name: "value"
+#         type: "DOUBLE"
+#         description: "生データの値"
+#       - name: "is_valid"
+#         type: "BOOLEAN"
+#         description: "有効なデータかどうか"
+#         default: true
+#     foreign_keys:
+#       - name: "fk_raw_data_trial"
+#         columns: ["trial_id"]
+#         references:
+#           table: "trials"
+#           columns: ["trial_id"]
+#         on_delete: "RESTRICT"
+#       - name: "fk_raw_data_definition"
+#         columns: ["raw_data_id"]
+#         references:
+#           table: "raw_data_definitions"
+#           columns: ["raw_data_id"]
+#         on_delete: "RESTRICT"
+#     indexes:
+#       - name: "idx_raw_data_trial"
+#         columns: ["trial_id"]
+#       - name: "idx_raw_data_definition"
+#         columns: ["raw_data_id"]
+#       - name: "idx_raw_data_composite"
+#         columns: ["trial_id", "raw_data_id"]
+
+#   - name: "preprocessed_data"
+#     table_name: "preprocessed_data"
+#     description: "前処理済みの時系列データ"
+#     primary_key: ["trial_id", "frame", "preprocessed_data_id"]
+#     attributes:
+#       - name: "trial_id"
+#         type: "INTEGER"
+#         description: "試行ID"
+#         constraints: "NOT NULL"
+#       - name: "frame"
+#         type: "INTEGER"
+#         description: "フレーム番号 (正規化された時刻)"
+#         constraints: "NOT NULL"
+#       - name: "preprocessed_data_id"
+#         type: "INTEGER"
+#         description: "前処理済みデータID"
+#         constraints: "NOT NULL"
+#       - name: "value"
+#         type: "DOUBLE"
+#         description: "前処理済みデータの値"
+#       - name: "is_valid"
+#         type: "BOOLEAN"
+#         description: "有効なデータかどうか"
+#         default: true
+#     foreign_keys:
+#       - name: "fk_preprocessed_data_trial"
+#         columns: ["trial_id"]
+#         references:
+#           table: "trials"
+#           columns: ["trial_id"]
+#         on_delete: "CASCADE"
+#       - name: "fk_preprocessed_data_definition"
+#         columns: ["preprocessed_data_id"]
+#         references:
+#           table: "preprocessed_data_definitions"
+#           columns: ["preprocessed_data_id"]
+#         on_delete: "CASCADE"
+#     indexes:
+#       - name: "idx_preprocessed_data_trial"
+#         columns: ["trial_id"]
+#       - name: "idx_preprocessed_data_definition"
+#         columns: ["preprocessed_data_id"]
+#       - name: "idx_preprocessed_data_composite"
+#         columns: ["trial_id", "preprocessed_data_id"]
+
+#   - name: "data_processing_log"
+#     table_name: "data_processing_logs"
+#     description: "データ処理履歴"
+#     primary_key: "log_id"
+#     attributes:
+#       - name: "log_id"
+#         type: "INTEGER"
+#         description: "ログID"
+#         constraints: "PRIMARY KEY"
+#       - name: "trial_id"
+#         type: "INTEGER"
+#         description: "試行ID"
+#         constraints: "NOT NULL"
+#       - name: "processing_type"
+#         type: "TEXT"
+#         description: "処理タイプ"
+#         constraints: "NOT NULL"
+#       - name: "description"
+#         type: "TEXT"
+#         description: "処理内容"
+#       - name: "processed_at"
+#         type: "TIMESTAMP"
+#         description: "処理日時"
+#         default: "CURRENT_TIMESTAMP"
+#     foreign_keys:
+#       - name: "fk_log_trial"
+#         columns: ["trial_id"]
+#         references:
+#           table: "trials"
+#           columns: ["trial_id"]
+#         on_delete: "CASCADE"
+#     indexes:
+#       - name: "idx_log_trial"
+#         columns: ["trial_id"]
+#       - name: "idx_log_processed_at"
+#         columns: ["processed_at"]
+
+# relationships:
+#   - name: "subject_has_trials"
+#     description: "一人の被験者は複数の試行を持つ"
+#     from:
+#       entity: "subject"
+#       cardinality: "one"
+#     to:
+#       entity: "trial"
+#       cardinality: "many"
+#     join_columns: ["subject_id"]
+
+#   - name: "trial_has_raw_data"
+#     description: "一つの試行は複数の生データを持つ"
+#     from:
+#       entity: "trial"
+#       cardinality: "one"
+#     to:
+#       entity: "raw_data"
+#       cardinality: "many"
+#     join_columns: ["trial_id"]
+
+#   - name: "trial_has_preprocessed_data"
+#     description: "一つの試行は複数の前処理済みデータを持つ"
+#     from:
+#       entity: "trial"
+#       cardinality: "one"
+#     to:
+#       entity: "preprocessed_data"
+#       cardinality: "many"
+#     join_columns: ["trial_id"]
+
+#   - name: "raw_data_definition_used_in_raw_data"
+#     description: "生データ定義は複数の生データレコードで使用される"
+#     from:
+#       entity: "raw_data_definition"
+#       cardinality: "one"
+#     to:
+#       entity: "raw_data"
+#       cardinality: "many"
+#     join_columns: ["raw_data_id"]
+
+#   - name: "preprocessed_data_definition_used_in_preprocessed_data"
+#     description: "前処理済みデータ定義は複数の前処理済みデータレコードで使用される"
+#     from:
+#       entity: "preprocessed_data_definition"
+#       cardinality: "one"
+#     to:
+#       entity: "preprocessed_data"
+#       cardinality: "many"
+#     join_columns: ["preprocessed_data_id"]
