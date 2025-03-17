@@ -1,5 +1,5 @@
 # ベースイメージとして設定ファイル(/env/python.json)で指定されたPythonを使用
-ARG PYTHON_IMAGE=python:3.13-slim
+ARG PYTHON_IMAGE=python:3.12-slim
 FROM ${PYTHON_IMAGE}
 
 # 作業ディレクトリの設定
@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
     graphviz \
+    libatlas-base-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
