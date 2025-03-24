@@ -322,3 +322,5 @@ analysis-template/
 * rtar listコマンドなどでデータ構造やバージョン情報を一覧表示
     * DVCでディレクトリ単位で管理しているデータにも対応
     * DB中での階層構造も表示したい
+* DATA_REQUIREMENTS.mdをUMLで記述
+    * DocumentationRules.mdを更新
