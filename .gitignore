@@ -17,6 +17,7 @@ __pycache__/
 dist/
 build/
 *.whl
+.venv/*
 
 # Jupyter Notebook関連
 .ipynb_checkpoints/
