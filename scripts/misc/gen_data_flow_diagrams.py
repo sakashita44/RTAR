@@ -17,19 +17,34 @@ def generate_mermaid_for_data(data_name, data_requirements):
     processing = data_requirements.get("processing", {}).get(data_name, {})
     if not processing:
         print(f"Warning: '{data_name}'の処理情報が見つかりません")
-        return ""
+        return "", []
 
     # ノードとエッジの情報を収集
     nodes = {}  # {node_name: node_type} - 'raw', 'step', 'final'のいずれか
     edges = []  # [(from_node, to_node, label)]
+    node_details = {}  # {node_name: {type: タイプ, description: 説明, ...}}
 
     # 生データノードを追加
     raw_data = data_requirements.get("raw_data", {})
-    for raw_name in raw_data:
+    for raw_name, raw_info in raw_data.items():
         nodes[raw_name] = "raw"
+        node_details[raw_name] = {
+            "type": "生データ",
+            "description": raw_info.get("description", ""),
+            "format": raw_info.get("format", ""),
+            "unit": raw_info.get("unit", ""),
+        }
 
     # 最終データを追加
+    required_data = data_requirements.get("required_data", {})
     nodes[data_name] = "final"
+    node_details[data_name] = {
+        "type": "最終データ",
+        "description": required_data.get(data_name, {}).get("description", ""),
+        "format": required_data.get(data_name, {}).get("output_format", ""),
+        "unit": required_data.get(data_name, {}).get("unit", ""),
+        "formula": required_data.get(data_name, {}).get("formula", ""),
+    }
 
     # ステップとデータの収集
     steps_info = {}  # ステップ情報を保持
@@ -60,6 +75,33 @@ def generate_mermaid_for_data(data_name, data_requirements):
         steps_info[step_name] = step
         nodes[step_name] = "step"
 
+        # ステップの詳細情報を保存
+        process_info = step.get("process", [])
+        process_desc = "\n".join(process_info) if process_info else ""
+
+        parameters = step.get("parameters", {})
+        param_desc = ""
+        if isinstance(parameters, list):
+            # リスト形式のパラメータ処理
+            for param in parameters:
+                if isinstance(param, dict):
+                    name = param.get("name", "")
+                    value = param.get("value", "")
+                    unit = param.get("unit", "")
+                    param_desc += f"{name}: {value} {unit}\n"
+        else:
+            # 辞書形式のパラメータ処理
+            for param_name, param_info in parameters.items():
+                value = param_info.get("value", "")
+                unit = param_info.get("unit", "")
+                param_desc += f"{param_name}: {value} {unit}\n"
+
+        node_details[step_name] = {
+            "type": "処理ステップ",
+            "description": process_desc,
+            "parameters": param_desc.strip(),
+        }
+
         # 入力データの処理
         input_data = step.get("input_data", [])
         if isinstance(input_data, str):
@@ -72,22 +114,28 @@ def generate_mermaid_for_data(data_name, data_requirements):
 
         # 出力データの処理
         output_data = step.get("output_data", {})
-        for output_name in output_data:
+        for output_name, output_info in output_data.items():
             output_sources[output_name] = step_name
+
+            # 中間出力データの情報も保存
+            if output_name != data_name:
+                node_details[output_name] = {
+                    "type": "中間データ",
+                    "description": output_info.get("description", ""),
+                    "format": output_info.get("format", ""),
+                    "unit": output_info.get("unit", ""),
+                }
 
     # データフローの構築
     for output_name, source_step in output_sources.items():
-        # この出力データを使用するステップを検索
         consumers = input_consumers.get(output_name, [])
 
-        if output_name == data_name:
-            # 最終データへのエッジ
+        # 使用される/最終データ問わず表示する
+        if not consumers:
+            # 中間データでも使われなくてもノードを残したい場合はこちらでエッジを省略するだけ
+            # pass
             edges.append((source_step, output_name, output_name))
-        elif not consumers:
-            # 使用されない中間データは表示しない
-            pass
         else:
-            # 中間データを使用するステップへのエッジ
             for consumer_step in consumers:
                 edges.append((source_step, consumer_step, output_name))
 
@@ -103,6 +151,8 @@ def generate_mermaid_for_data(data_name, data_requirements):
     # ノードの追加（ステップ、生データ、最終データのみ）
     node_id = {}
     counter = 0
+    visible_nodes = []
+
     for node_name, node_type in nodes.items():
         # 中間データはノードとして表示しない
         if node_type not in ["raw", "step", "final"]:
@@ -112,6 +162,7 @@ def generate_mermaid_for_data(data_name, data_requirements):
             str(counter // 26) if counter >= 26 else ""
         )
         counter += 1
+        visible_nodes.append(node_name)
 
         if node_type == "raw":
             mermaid.append(f"    {node_id[node_name]}[/{node_name}/]")
@@ -129,17 +180,58 @@ def generate_mermaid_for_data(data_name, data_requirements):
             edge += f"{node_id[dst]}"
             mermaid.append(edge)
 
-    return "\n".join(mermaid)
+    # ノード説明表の作成
+    node_details_list = []
+    for node_name in visible_nodes:
+        if node_name in node_details:
+            details = node_details[node_name]
+            node_id_str = node_id.get(node_name, "")
+
+            # ノードタイプに応じた詳細情報を表に追加
+            if (
+                details["type"] == "生データ"
+                or details["type"] == "最終データ"
+                or details["type"] == "中間データ"
+            ):
+                node_details_list.append(
+                    {
+                        "id": node_id_str,
+                        "name": node_name,
+                        "type": details["type"],
+                        "description": details["description"],
+                        "format": details["format"],
+                        "unit": details["unit"],
+                        "formula": details.get("formula", ""),
+                    }
+                )
+            elif details["type"] == "処理ステップ":
+                node_details_list.append(
+                    {
+                        "id": node_id_str,
+                        "name": node_name,
+                        "type": details["type"],
+                        "description": details["description"],
+                        "parameters": details["parameters"],
+                        "format": "",
+                        "unit": "",
+                        "formula": "",
+                    }
+                )
+
+    return "\n".join(mermaid), node_details_list
 
 
 def generate_all_mermaid(data_requirements):
     """すべての最終データに対するmermaidダイアグラムを生成する"""
     results = {}
-    for data_name in data_requirements.get("required_data", {}):
-        mermaid = generate_mermaid_for_data(data_name, data_requirements)
-        results[data_name] = mermaid
+    details_results = {}
 
-    return results
+    for data_name in data_requirements.get("required_data", {}):
+        mermaid, details = generate_mermaid_for_data(data_name, data_requirements)
+        results[data_name] = mermaid
+        details_results[data_name] = details
+
+    return results, details_results
 
 
 def main():
@@ -155,7 +247,7 @@ def main():
         output_file = Path(sys.argv[2])
     else:
         # デフォルト出力ファイルパス
-        output_file = yaml_path.parent / "DATA_FLOW_DIAGRAMS.md"
+        output_file = yaml_path.parent / "auto_generated/DATA_FLOW_DIAGRAMS.md"
 
     # YAMLファイルの読み込み
     try:
@@ -165,18 +257,103 @@ def main():
         return 1
 
     # mermaidダイアグラム生成
-    mermaid_diagrams = generate_all_mermaid(data_requirements)
+    mermaid_diagrams, node_details = generate_all_mermaid(data_requirements)
 
     # 出力（標準出力または別ファイル）
     with output_file.open("w", encoding="utf-8") as f:
-        f.write("# データフロー図\n\n")
+        f.write("# 詳細なデータフロー図\n\n")
         for data_name, mermaid in mermaid_diagrams.items():
             f.write(f"## {data_name}\n\n")
+            f.write("### フロー図\n\n")
             f.write("```mermaid\n")
             f.write(mermaid + "\n")
             f.write("```\n\n")
 
-    print(f"mermaidダイアグラムが生成されました: {output_file}")
+            # ノード詳細テーブルの追加
+            f.write("### ノード詳細\n\n")
+
+            # 生データノードのテーブル
+            f.write("#### 生データ\n\n")
+            f.write("| ID | 名前 | 説明 | 形式 | 単位 |\n")
+            f.write("|-----|-----|-----|-----|-----|\n")
+
+            raw_nodes = [n for n in node_details[data_name] if n["type"] == "生データ"]
+            if raw_nodes:
+                for node in raw_nodes:
+                    f.write(
+                        f"| {node['id']} | {node['name']} | {node['description']} | {node['format']} | {node['unit']} |\n"
+                    )
+            else:
+                f.write("| - | - | - | - | - |\n")
+
+            f.write("\n")
+
+            # 処理ステップノードのテーブル
+            f.write("#### 処理ステップ\n\n")
+            f.write("| ID | 名前 | 処理内容 | パラメータ |\n")
+            f.write("|-----|-----|-----|-----|\n")
+
+            step_nodes = [
+                n for n in node_details[data_name] if n["type"] == "処理ステップ"
+            ]
+            if step_nodes:
+                for node in step_nodes:
+                    # 改行をHTML形式に変換
+                    desc = node["description"].replace("\n", "<br>")
+                    params = node["parameters"].replace("\n", "<br>")
+                    f.write(f"| {node['id']} | {node['name']} | {desc} | {params} |\n")
+            else:
+                f.write("| - | - | - | - |\n")
+
+            f.write("\n")
+
+            # 中間データノードのテーブル
+            f.write("#### 中間データ\n\n")
+            f.write("| 名前 | 説明 | 形式 | 単位 |\n")
+            f.write("|-----|-----|-----|-----|\n")
+
+            # 修正: 現在のデータに関連する中間データを取得
+            intermediate_nodes = []
+            for node in node_details[data_name]:
+                if node["type"] == "中間データ":
+                    intermediate_nodes.append(
+                        {
+                            "name": node["name"],
+                            "description": node.get("description", ""),
+                            "format": node.get("format", ""),
+                            "unit": node.get("unit", ""),
+                        }
+                    )
+
+            if intermediate_nodes:
+                for node in intermediate_nodes:
+                    f.write(
+                        f"| {node['name']} | {node['description']} | {node['format']} | {node['unit']} |\n"
+                    )
+            else:
+                f.write("| - | - | - | - |\n")
+
+            f.write("\n")
+
+            # 最終データノードのテーブル
+            f.write("#### 最終データ\n\n")
+            f.write("| ID | 名前 | 説明 | 形式 | 単位 | 計算式 |\n")
+            f.write("|-----|-----|-----|-----|-----|-----|\n")
+
+            final_nodes = [
+                n for n in node_details[data_name] if n["type"] == "最終データ"
+            ]
+            if final_nodes:
+                for node in final_nodes:
+                    f.write(
+                        f"| {node['id']} | {node['name']} | {node['description']} | {node['format']} | {node['unit']} | {node['formula']} |\n"
+                    )
+            else:
+                f.write("| - | - | - | - | - | - |\n")
+
+            f.write("\n")
+
+    print(f"詳細なデータフロー図が生成されました: {output_file}")
     return 0
 
 
