@@ -324,3 +324,5 @@ analysis-template/
     * DB中での階層構造も表示したい
 * DATA_REQUIREMENTS.mdをUMLで記述
     * DocumentationRules.mdを更新
+* データのバリデーションステップを組み込めるように
+    * 削除したデータ/特殊な処理を施したデータがあとから追えるようにしたい
