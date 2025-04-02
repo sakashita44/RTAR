@@ -27,10 +27,7 @@ body:
     attributes:
       label: "チェックリスト"
       description: "TODOの進捗を管理するためのチェックリストを作成"
-      options:
-        - label: "タスク1"
-        - label: "タスク2"
-        - label: "タスク3"
+      options: []
 
   - type: dropdown
     id: priority
