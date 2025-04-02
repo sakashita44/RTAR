@@ -1,71 +1,98 @@
 # データと加工手順の事前定義
 
 metadata:
-  purpose: <解析やデータ算出の目的，意義>
+  purpose: 解析目的
   note:
-    - <用語定義やその他の補足情報1>
-    - <用語定義やその他の補足情報2>
-    - ...
+    - 用語:
+        - 用語1: 説明
+        - 用語2: 説明
+    - 注意点:
+        - 注意点1
+        - 注意点2
 
-required_data:
-  <データ名>:
-    description: <最終データの目的や意味>
-    input_data: [
-        <算出に必要なデータのデータ名1>,
-        <算出に必要なデータのデータ名2>,
-        ...,
-      ] # 単一の場合文字列でも可
-    output_format: <最終データの形式>
-    unit: <最終データの単位>
-    formula: <計算式>
+target:
+  - single_data_X
+  - ts_data_Y
 
-raw_data:
-  <データ名1>:
-    description: <データの内容>
-    format: <ファイルタイプや構造>
-    unit: <データの単位>
-  <データ名2>:
-    description: <データの内容>
-    format: <ファイルタイプや構造>
-    unit: <データの単位>
+data:
+  rawA:
+    description: 概要
+    format: フォーマット
+    unit: 単位
+    special_note: |
+      md形式による特記事項
+      改行も可能
+  rawB:
+    description: 概要
+    format: フォーマット
+    unit: 単位
+    special_note: |
+      md形式による特記事項
+      改行も可能
+  dataA:
+    description: 概要
+    format: フォーマット
+    unit: 単位
+    required_data:
+      - rawA
+    required_parameter:
+      - parameter1
+    process:
+      - 処理1
+      - 処理2
+    special_note: |
+      md形式による特記事項
+      改行も可能
+  dataB:
+    description: 概要
+    format: フォーマット
+    unit: 単位
+    required_data:
+      - rawB
+      - dataA
+    process:
+      - 処理1
+      - 処理2
+    special_note: |
+      md形式による特記事項
+      改行も可能
+  single_data_X:
+    description: 概要
+    format: フォーマット
+    unit: 単位
+    required_data:
+      - dataA
+      - dataB
+    required_parameter:
+      - parameter2
+    process:
+      - 処理1
+      - 処理2
+  ts_data_Y:
+    description: 概要
+    format: フォーマット
+    unit: 単位
+    required_data:
+      - dataA
+      - dataB
+    process:
+      - 処理1
+      - 処理2
 
-processing:
-  <最終データ名>:
-    steps:
-      - name: <ステップ名> # ステップ名は重複禁止
-        input_data: [<入力データ名1>, <入力データ名2>, ...] # 単一の場合文字列でも可
-        process:
-          - <処理内容1>
-          - <処理内容2>
-          - ...
-        output_data:
-          <出力データ名1>:
-            description: <出力データの説明>
-            format: <出力データの形式>
-            unit: <出力データの単位>
-          <出力データ名2>:
-            description: <出力データの説明>
-            format: <出力データの形式>
-            unit: <出力データの単位>
-        parameters: # パラメータは省略可能
-          <パラメータ名1>:
-            description: <パラメータの説明>
-            value: <パラメータの値>
-            unit: <パラメータの単位>
-          <パラメータ名2>:
-            description: <パラメータの説明>
-            value: <パラメータの値>
-            unit: <パラメータの単位>
-        notes:
-          - <備考1>
-          - <備考2>
-          - ...
-
-      - <既存のステップ名> # 省略記法 (すでに定義されているステップを再利用)
-      - ...
-
-special_data_format:
-  <特殊なデータ形式名>:
-    description: <特殊なデータ形式の説明>
-    format: |
-      <特殊なデータ形式の内容, markdown形式で記述>
+parameter:
+  parameter1:
+    description: 概要
+    format: フォーマット
+    unit: 単位
+    value: 0
+    special_note: |
+      md形式による特記事項
+      改行も可能
+  parameter2:
+    description: 概要
+    format: フォーマット
+    unit: 単位
+    value: 0
+    special_note: |
+      md形式による特記事項
+      改行も可能
