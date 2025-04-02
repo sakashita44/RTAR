@@ -22,13 +22,6 @@ body:
       description: "TODOの詳細な内容を記述"
       placeholder: "例: データ処理のステップXを並列化する"
 
-  - type: checkboxes
-    id: checklist
-    attributes:
-      label: "チェックリスト"
-      description: "TODOの進捗を管理するためのチェックリストを作成"
-      options: []
-
   - type: dropdown
     id: priority
     attributes:
