@@ -1,4 +1,4 @@
-# RTAR (Reproducible and Traceable Analysis for Research)
+# rtar (Reproducible and Traceable Analysis for Research)
 
 ## 概要
 
