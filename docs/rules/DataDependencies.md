@@ -3,12 +3,12 @@
 `data_dependencies.yml` の記述ルール
 
 * [Data Dependencies Rule](#data-dependencies-rule)
-    * [概要](#概要)
-    * [全体構造](#全体構造)
-    * [`metadata` セクション](#metadata-セクション)
-    * [`target` セクション](#target-セクション)
-    * [`data` セクション](#data-セクション)
-    * [`parameter` セクション](#parameter-セクション)
+  * [概要](#概要)
+  * [全体構造](#全体構造)
+  * [`metadata` セクション](#metadata-セクション)
+  * [`target` セクション](#target-セクション)
+  * [`data` セクション](#data-セクション)
+  * [`parameter` セクション](#parameter-セクション)
 
 ## 概要
 
@@ -43,7 +43,10 @@ parameter:
 
 * `title` (必須): 解析目的を簡潔に示すタイトル (文字列).
 * `purposes` (必須): 解析やデータ算出の目的, 意義を記述するリスト (文字列のリスト).
-* `note` (任意): 用語定義やその他の補足情報を記述するリスト.
+* `terms` (任意): 解析に関連する用語を定義するリスト.
+    * `name` (必須): 用語名 (文字列).
+    * `description` (必須): 用語の説明 (文字列).
+* `note` (任意): 用語定義やその他の補足情報を記述するリスト (文字列のリスト).
 
 ```yaml
 metadata:
@@ -51,12 +54,14 @@ metadata:
   purposes:
     - 解析目的1
     - 解析目的2
+  terms:
+    - name: 用語1
+      description: 用語1の説明
+    - name: 用語2
+      description: 用語2の説明
   note:
-    - 用語:
-        - 用語1: 説明
-        - 用語2: 説明
-    - 注意点:
-        - 注意点1
+    - 注意事項1
+    - 注意事項2
 ```
 
 ## `target` セクション
