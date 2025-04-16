@@ -45,7 +45,7 @@ parameter:
 * `purposes` (必須): 解析やデータ算出の目的, 意義を記述するリスト (文字列のリスト).
 * `terms` (任意): 解析に関連する用語を定義するリスト.
     * `name` (必須): 用語名 (文字列).
-    * `description` (必須): 用語の説明 (文字列).
+    * `descriptions` (必須): 用語の説明を記述するリスト (文字列のリスト).
 * `note` (任意): 用語定義やその他の補足情報を記述するリスト (文字列のリスト).
 
 ```yaml
@@ -55,10 +55,12 @@ metadata:
     - 解析目的1
     - 解析目的2
   terms:
-    - name: 用語1
-      description: 用語1の説明
-    - name: 用語2
-      description: 用語2の説明
+    - name: "用語1"
+      descriptions:
+        - "用語1の説明"
+    - name: "用語2"
+      descriptions:
+        - "用語2の説明"
   note:
     - 注意事項1
     - 注意事項2
