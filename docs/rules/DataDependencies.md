@@ -3,12 +3,20 @@
 `data_dependencies.yml` の記述ルール
 
 * [Data Dependencies Rule](#data-dependencies-rule)
-  * [概要](#概要)
-  * [全体構造](#全体構造)
-  * [`metadata` セクション](#metadata-セクション)
-  * [`target` セクション](#target-セクション)
-  * [`data` セクション](#data-セクション)
-  * [`parameter` セクション](#parameter-セクション)
+    * [概要](#概要)
+    * [全体構造](#全体構造)
+    * [`metadata` セクション](#metadata-セクション)
+    * [`target` セクション](#target-セクション)
+    * [`data` セクション](#data-セクション)
+        * [可変長列数のデータを定義する場合](#可変長列数のデータを定義する場合)
+            * [定義方法](#定義方法)
+            * [列名の決定ルール](#列名の決定ルール)
+            * [YAML 記述例](#yaml-記述例)
+                * [例1: 参照データ (`uid`) が `table` 形式の場合](#例1-参照データ-uid-が-table-形式の場合)
+                * [例2: 参照データ (`sensor_ids`) が `list` 形式の場合](#例2-参照データ-sensor_ids-が-list-形式の場合)
+                * [例3: 参照データ (`device_map`) が `dictionary` 形式の場合](#例3-参照データ-device_map-が-dictionary-形式の場合)
+            * [例4: 参照データ (`device_map`) が 上記以外の形式の場合](#例4-参照データ-device_map-が-上記以外の形式の場合)
+    * [`parameter` セクション](#parameter-セクション)
 
 ## 概要
 
@@ -83,15 +91,25 @@ target:
 
 解析で使用する全てのデータを定義するセクション (必須).
 このセクションに記載のないデータは解析で使用できない.
+計測の結果や, 解析の過程で生成されるデータを定義する.
+required_data や required_parameter で他のデータやパラメータとの依存関係を定義することができる.
 
 * キー: 任意のデータ名 (文字列, 必須). この名前はファイル内で一意である必要がある.
 * 値: 各データの詳細を定義する辞書.
     * `descriptions` (必須): データの概要や目的を記述するリスト (文字列のリスト).
-    * `format` (必須): データの形式を示す文字列 (`table`, `single`, `time_series` など. 拡張子ではない).
-    * `unit` (必須): データの単位を示す文字列. 単位がない場合やテーブル形式の場合は `-` を記述する.
-    * `columns` (任意): データが `table` 形式の場合に列情報を定義するリスト. format が `table` の場合は必須.
+    * `format` (必須): データの論理的な形式を示す文字列. 特定のファイル拡張子ではない. 以下のような形式を想定する.
+        * `table`: 行と列で構成される表形式データ. 時系列データもこれに含まれる.
+        * `dictionary`: キーと値のペアで構成されるデータ (JSON, YAML などデータ交換フォーマットを含む).
+        * `list`: 順序付けられた値のシーケンス.
+        * `single`: 単一の値.
+        * `binary`: 画像, 音声, C3D など特定の構造を持つバイナリデータ.
+        * `document`: テキスト中心の文書 (プレーンテキスト, HTML, XML など).
+    * `unit` (必須): データの単位を示す文字列. 単位がない場合や `table`, `dictionary` 形式などデータ全体で単一の単位を定義できない場合は `-` を記述する.
+    * `columns` (任意): データが `table` 形式の場合に列情報を定義するリスト. `format` が `table` の場合は必須.
         * `name` (必須): 列名 (文字列).
+            * 列名の末尾に `*` を付けると, その列以降が可変長であることを示す. 詳細は[可変長列数のデータを定義する場合](#可変長列数のデータを定義する場合)を参照.
         * `description` (必須): 列の説明 (文字列). 単位を含む場合は単位も記載する.
+        * `key_source` (任意): `name` に `*` が付いており, **かつ参照されるデータ (例: `uid`) の `format` が `table` の場合に必須**. 参照データ内で実際の列名として使用する列の名前を指定する (文字列). (例: `id`). 詳細は[可変長列数のデータを定義する場合](#可変長列数のデータを定義する場合)を参照.
     * `required_data` (任意): このデータの生成に必要な他のデータを指定するリスト. `data` セクションに存在するデータ名を記述する (文字列のリスト).
     * `required_parameter` (任意): このデータの生成に必要なパラメータを指定するリスト. `parameter` セクションに存在するパラメータ名を記述する (文字列のリスト).
     * `process` (任意): このデータを生成するための処理手順を記述するリスト. 自然言語で記述し, 特定のスクリプト名などは可能な限り避ける (文字列のリスト).
@@ -112,7 +130,7 @@ data:
   dataA:
     descriptions:
       - 説明1
-    format: time_series
+    format: table # time_series は table に含める
     unit: mV
     required_data: # 依存データ
       - rawA
@@ -123,10 +141,123 @@ data:
       - parameter1 を用いてフィルタリング
 ```
 
+### 可変長列数のデータを定義する場合
+
+`data` セクションの `columns` で, 列数が可変となるデータを定義できる.
+
+#### 定義方法
+
+* `columns` リスト内で, 可変長部分の開始を示したい列の `name` の末尾にアスタリスク `*` を付加する.
+* アスタリスクを除いた `name` (例: `uid`) は, `data` セクションで定義済みの他のデータ名を指す必要がある. このデータを「参照データ」と呼ぶ.
+
+#### 列名の決定ルール
+
+可変長部分の実際の列名は, 参照データの `format` によって決定方法が異なる.
+
+* **参照データの `format` が `table` の場合:**
+    * `key_source` キーが必須となる.
+    * `key_source` には, 参照データ (`table` 形式) の中で, 実際の列名として使用したい列の名前を指定する.
+    * 指定された列 (例: `uid` テーブルの `id` 列) の値が, 可変長部分の列名となる.
+* **参照データの `format` が `dictionary` の場合:**
+    * `key_source` キーは不要 (指定しても無視される).
+    * 参照データのキーが, 可変長部分の列名となる.
+* **参照データの `format` が `list` の場合:**
+    * `key_source` キーは不要 (指定しても無視される).
+    * 参照データに含まれる値そのものが, 可変長部分の列名となる.
+* **上記以外の `format` (`single`, `binary`, `document` など) の場合:**
+    * これらの形式は通常, 可変長列の列名を生成するための参照元としては使用されない. もし参照元として指定された場合の挙動は未定義またはエラーとするのが適切である.
+
+#### YAML 記述例
+
+##### 例1: 参照データ (`uid`) が `table` 形式の場合
+
+```yaml
+data:
+  uid:
+    descriptions:
+      - ユーザー情報
+    format: table
+    unit: "-"
+    columns:
+      - name: id
+        description: ユーザーID (文字列)
+      - name: group
+        description: 所属グループ (文字列)
+  experiment_data:
+    descriptions:
+      - 実験結果
+    format: table
+    unit: "-"
+    columns:
+      - name: time
+        description: 経過時間 (s)
+      - name: uid* # 可変長列. 参照データは 'uid'
+        description: 各ユーザーの計測値 (mV)
+        key_source: id # 'uid' テーブルの 'id' 列の値を列名として使用
+```
+
+この場合, `experiment_data` の列は `time`, `user001`, `user002`, ... のようになる (もし `uid` テーブルの `id` 列に `user001`, `user002` が含まれていれば).
+
+##### 例2: 参照データ (`sensor_ids`) が `list` 形式の場合
+
+```yaml
+data:
+  sensor_ids:
+    descriptions:
+      - 使用したセンサーのIDリスト
+    format: list
+    unit: "-"
+    # list の各要素はセンサーID (例: 'sensorA', 'sensorB') とする
+  sensor_readings:
+    descriptions:
+      - センサー計測値
+    format: table
+    unit: "value_unit"
+    columns:
+      - name: timestamp
+        description: 計測時刻 (iso8601)
+      - name: sensor_ids* # 可変長列. 参照データは 'sensor_ids'
+        description: 各センサーの計測値 (value_unit)
+        # key_source は不要 (sensor_ids の format が list のため)
+```
+
+この場合, `sensor_readings` の列は `timestamp`, `sensorA`, `sensorB`, ... のようになる (もし `sensor_ids` リストに `'sensorA'`, `'sensorB'` が含まれていれば).
+
+##### 例3: 参照データ (`device_map`) が `dictionary` 形式の場合
+
+```yaml
+data:
+  device_map:
+    descriptions:
+      - デバイス名とIPアドレスのマッピング
+    format: dictionary
+    unit: "-"
+    # dictionary の内容は {'device1': '192.168.1.10', 'device2': '192.168.1.11'} などと仮定
+  device_status:
+    descriptions:
+      - デバイスのステータス
+    format: table
+    unit: "-"
+    columns:
+      - name: check_time
+        description: 確認時刻 (iso8601)
+      - name: device_map* # 可変長列. 参照データは 'device_map'
+        description: 各デバイスのステータス (OK/NG/...)
+        # key_source は不要 (device_map の format が dictionary のため)
+```
+
+この場合, `device_status` の列は `check_time`, `device1`, `device2`, ... のようになる (もし `device_map` 辞書のキーに `device1`, `device2` が含まれていれば).
+
+#### 例4: 参照データ (`device_map`) が 上記以外の形式の場合
+
+参照データの `format` が `single`, `binary`, `document` などの場合, 可変長列の列名を生成するための参照元としては使用しないことが望ましい.
+もし参照元として指定された場合の挙動は未定義またはエラーとするのが適切である.
+
 ## `parameter` セクション
 
 解析で使用するパラメータを定義するセクション (任意).
 このセクションに記載のないパラメータは解析で使用できない.
+他のデータに依存しない, かつ計測等の結果に基づかず, ユーザーが設定するパラメータを定義する.
 
 * キー: 任意のパラメータ名 (文字列, 必須). この名前はファイル内で一意である必要がある.
 * 値: 各パラメータの詳細を定義する辞書.
