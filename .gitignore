@@ -6,6 +6,9 @@ data/**/*.csv
 data/**/*.json
 data/**/*.c3d
 
+# 自動生成されるinfo/ディレクトリ内のファイル
+info/*
+
 # Python関連
 __pycache__/
 *.py[cod]
