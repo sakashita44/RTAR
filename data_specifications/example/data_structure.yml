@@ -1,0 +1,86 @@
+placeholder:
+  "{A}": user_ids
+
+data:
+  raw_sensor_data:
+    path: "data/raw/sensor_data/{A}.csv"
+    layout: long
+    columns:
+      - name: timestamp
+        type: DATETIME
+      - name: value_raw
+        type: DOUBLE
+      - name: status_flag
+        type: INTEGER
+  processed_data:
+    path: "data/processed/processed_data/{A}.csv"
+    layout: long
+    columns:
+      - name: timestamp
+        type: DATETIME
+      - name: value
+        type: DOUBLE
+  filtered_data:
+    path: "data/processed/filtered_data/{A}.csv"
+    layout: long
+    columns:
+      - name: timestamp
+        type: DATETIME
+      - name: value_filtered
+        type: DOUBLE
+  statistics_summary:
+    path: "results/summary/statistics_summary.yml"
+    layout: dictionary
+    keys:
+      - name: mean
+        type: DOUBLE
+      - name: stddev
+        type: DOUBLE
+  user_ids:
+    path: "data/config/user_ids.json"
+    layout: list
+    type: STRING # list の要素の型を追記 (ルール上必須, 例として STRING)
+  user_specific_summary:
+    path: "results/summary/user_specific_summary_{A}.csv" # パスにプレースホルダーを追加
+    layout: wide
+    columns:
+      - name: timestamp # data_dependencies.yml に合わせて追加
+        type: DATETIME
+      - name: user_ids*
+        type: DOUBLE # ユーザーごとの統計値 (数値)
+  calculated_threshold:
+    path: "results/values/calculated_threshold.txt"
+    layout: other
+    type: DOUBLE # 単一の値の型を追記
+  raw_image:
+    path: "data/raw/image_{A}.png" # パスにプレースホルダーを追加 (例)
+    layout: other
+    type: STRING # 画像ファイル等はPATHなのでSTRING型を指定
+  processed_image:
+    path: "data/processed/processed_image_{A}.png" # パスにプレースホルダーを追加 (例)
+    layout: other
+    type: STRING # 画像ファイル等はPATHなのでSTRING型を指定
+  analysis_report:
+    path: "results/report/analysis_report_{A}.md" # パスにプレースホルダーを追加 (例)
+    layout: other
+    type: STRING # ドキュメントファイル等はPATHなのでSTRING型を指定
+
+parameter:
+  conversion_factor:
+    path: "params/config.yml"
+    type: DOUBLE
+  filter_threshold:
+    path: "params/config.yml"
+    type: DOUBLE
+  roi_top:
+    path: "params/image_processing.yml"
+    type: INTEGER
+  roi_bottom:
+    path: "params/image_processing.yml"
+    type: INTEGER
+  roi_left:
+    path: "params/image_processing.yml"
+    type: INTEGER
+  roi_right:
+    path: "params/image_processing.yml"
+    type: INTEGER
