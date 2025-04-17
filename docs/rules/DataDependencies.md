@@ -16,6 +16,9 @@
                 * [例2: 参照データ (`sensor_ids`) が `list` 形式の場合](#例2-参照データ-sensor_ids-が-list-形式の場合)
                 * [例3: 参照データ (`device_map`) が `dictionary` 形式の場合](#例3-参照データ-device_map-が-dictionary-形式の場合)
             * [例4: 参照データが上記以外の形式の場合](#例4-参照データが上記以外の形式の場合)
+        * [カスタム `format` の扱い](#カスタム-format-の扱い)
+        * [可変長キー数のdictionaryについて](#可変長キー数のdictionaryについて)
+            * [ユースケース: 対象ごとの統計量など](#ユースケース-対象ごとの統計量など)
     * [`parameter` セクション](#parameter-セクション)
 
 ## 概要
@@ -107,8 +110,7 @@ required_data や required_parameter で他のデータやパラメータとの�
     * `unit` (必須): データの単位を示す文字列 (自由記述).
         * `binary`, `document`他, 単位がない場合は`-`
         * `table` 形式の場合は `table` を指定し, `columns` で各列の単位を指定する.
-        * `dictionary` 形式の場合は各キーの値に対して単位を指定することが望ましい
-            * 例: `key1:unit1, key2:unit2`
+        * `dictionary` 形式の場合は `dictionary` を指定し, `keys` で各キーの単位を指定する.
         * `list` 形式の場合すべての要素の単位が同一になるはずなので, 単位を一つだけ指定する (例: `unit1`).
         * `single` 形式の場合は単位を一つだけ指定する (例: `unit1`).
     * `columns` (任意): データが `table` 形式の場合に列情報を定義するリスト. `format` が `table` の場合は必須.
@@ -116,6 +118,10 @@ required_data や required_parameter で他のデータやパラメータとの�
             * 列名の末尾に `*` を付けると, その列以降が可変長であることを示す. 詳細は[可変長列数のデータを定義する場合](#可変長列数のデータを定義する場合)を参照.
         * `description` (必須): 列の説明 (文字列). 単位を含む場合は単位も記載する.
         * `key_source` (任意): `name` に `*` が付いており, **かつ参照されるデータ (例: `uid`) の `format` が `table` の場合に必須**. 参照データ内で実際の列名として使用する列の名前を指定する (文字列). (例: `id`). 詳細は[可変長列数のデータを定義する場合](#可変長列数のデータを定義する場合)を参照.
+    * `keys` (任意): データが `dictionary` 形式の場合にキー情報を定義するリスト. `format` が `dictionary` の場合は必須.
+        * `name` (必須): キー名 (文字列).
+        * `description` (必須): キーの説明 (文字列). 単位を含む場合は単位も記載する.
+        * `unit` (必須): キーに対応する値の単位 (文字列). 単位がない場合は `-` を記述する.
     * `required_data` (任意): このデータの生成に必要な他のデータを指定するリスト. `data` セクションに存在するデータ名を記述する (文字列のリスト).
     * `required_parameter` (任意): このデータの生成に必要なパラメータを指定するリスト. `parameter` セクションに存在するパラメータ名を記述する (文字列のリスト).
     * `process` (任意): このデータを生成するための処理手順を記述するリスト. 自然言語で記述し, 特定のスクリプト名などは可能な限り避ける (文字列のリスト).
@@ -154,7 +160,7 @@ data:
     descriptions:
       - "key1: value1, key2:value2 のような辞書形式のデータ"
     format: dictionary # 辞書形式
-    unit: "key1:unit1, key2:unit2" # 辞書のキーに対する単位(自由記述)
+    unit: "dictionary" # 単位 (辞書なので `dictionary`)
     required_data:
       - rawA
     required_parameter:
@@ -162,7 +168,13 @@ data:
     process:
       - rawA から必要なデータを抽出
       - parameter2 を用いて変換
-    # dictionary の場合は columns は不要
+    keys: # dictionary の場合は keys を使用
+      - name: key1
+        description: 説明1
+        unit: unit1
+      - name: key2
+        description: 説明2
+        unit: unit2
 ```
 
 ### 可変長列数のデータを定義する場合
@@ -182,16 +194,17 @@ data:
 可変長部分の実際の列名は, 参照データの `format` によって決定方法が異なる.
 
 * **参照データの `format` が `table` の場合:**
-    * `key_source` で指定された列の値が, 可変長部分の列名となる.
-    * 例: 参照データ `uid` (`format: table`) の `key_source: id` と指定した場合, `uid` テーブルの `id` 列の値 (`user001`, `user002`, ...) が列名になる.
+    * `key_source` キーが必須となる.
+    * `key_source` には, 参照データ (`table` 形式) の中で, 実際の列名として使用したい列の名前を指定する.
+    * 指定された列 (例: `uid` テーブルの `id` 列) の値が, 可変長部分の列名となる.
 * **参照データの `format` が `dictionary` の場合:**
+    * `key_source` キーは不要 (指定しても無視される).
     * 参照データのキーが, 可変長部分の列名となる.
-    * 例: 参照データ `device_map` (`format: dictionary`) を指定した場合, `device_map` のキー (`device1`, `device2`, ...) が列名になる.
 * **参照データの `format` が `list` の場合:**
+    * `key_source` キーは不要 (指定しても無視される).
     * 参照データに含まれる値そのものが, 可変長部分の列名となる.
-    * 例: 参照データ `sensor_ids` (`format: list`) を指定した場合, `sensor_ids` の要素 (`sensorA`, `sensorB`, ...) が列名になる.
 * **上記以外の `format` (`single`, `binary`, `document` など) の場合:**
-    * これらの形式を参照データとして指定すること自体は可能だが, 通常, 列名の参照元としては不適切であるため, 意図した動作か確認が必要となる.
+    * これらの形式は通常, 可変長列の列名を生成するための参照元としては使用されない. もし参照元として指定された場合の挙動は未定義またはエラーとするのが適切である.
 
 #### YAML 記述例
 
@@ -218,7 +231,7 @@ data:
       - name: time
         description: 経過時間 (s)
       - name: uid* # 可変長列. 参照データは 'uid'
-        description: 各ユーザーの計測値 (mV) # 単位を追記
+        description: 各ユーザーの計測値 (mV)
         key_source: id # 'uid' テーブルの 'id' 列の値を列名として使用 (必須)
 ```
 
@@ -243,7 +256,7 @@ data:
       - name: timestamp
         description: 計測時刻 (iso8601)
       - name: sensor_ids* # 可変長列. 参照データは 'sensor_ids'
-        description: 各センサーの計測値 (V) # 単位を追記
+        description: 各センサーの計測値 (V)
         # key_source は不要 (sensor_ids の format が list のため).
 ```
 
@@ -257,7 +270,14 @@ data:
     descriptions:
       - デバイス名とIPアドレスのマッピング
     format: dictionary
-    unit: "-"
+    unit: "dictionary" # 単位 (辞書なので `dictionary`)
+    keys:
+      - name: device1
+        description: デバイス1のIPアドレス (文字列)
+        unit: "-"
+      - name: device2
+        description: デバイス2のIPアドレス (文字列)
+        unit: "-"
     # dictionary の内容は {'device1': '192.168.1.10', 'device2': '192.168.1.11'} などと仮定
   device_status:
     descriptions:
@@ -278,23 +298,102 @@ data:
 
 参照データの `format` が `single`, `binary`, `document` などの場合, 可変長列の参照元として指定することは推奨されない.
 
+### カスタム `format` の扱い
+
+`rtar-core` は, このドキュメントで定義されている `format` (`table`, `dictionary`, `list`, `single`, `binary`, `document`) 以外のカスタム `format` 名 (例: `tensor`) が `data_dependencies.yml` に記述されていても, 基本的にエラーとはしない.
+
+ただし, [`rtar-ddeps`](https://github.com/sakashita44/rtar-ddeps) によるバリデーションでは, 未定義の `format` はエラーとなる可能性がある. 将来的には, `rtar-ddeps` にユーザーがローカル設定でカスタム `format` を宣言し, ツールに認識させる機能を追加する予定である. `rtar-core` はその拡張に追従する形で, カスタム `format` の解釈をより適切に行えるように改善する可能性がある.
+
+### 可変長キー数のdictionaryについて
+
+`rtar-core` では, `format: dictionary` のデータにおいて, キーが他のデータに基づいて動的に変化する「可変長キー」の定義は推奨しない. つまり, `keys` リスト内の `name` に `*` を付けるといった記述は許容されない.
+
+この決定には以下の理由がある.
+
+* **意味的な曖昧さ**: `table` の可変長列は「対象（例: センサー）ごとに属性（列）を追加する」というワイド形式データとして比較的明確に解釈できる. 一方, `dictionary` のキーがデータ値から動的に生成されるルールは, 構造の予測を難しくし, データ構造（キー）とデータ値（キー生成に使われる参照データ）の境界が曖昧になりやすい.
+* **実装の複雑性**: 可変長キーを正しく解釈・検証するには, 参照データを読み込み, その形式に応じて期待されるキーのリストを動的に生成し, 実際の辞書と比較する複雑なロジックが必要となる. これは `table` の可変長列の扱いよりも複雑である.
+* **データモデリング**: キーがデータ値から派生する辞書は, 標準的なデータモデリングでは一般的ではない. 「センサーAの平均」「センサーBの平均」といった構造は, `table` 形式（特に正規化されたロング形式, または可変長列を用いたワイド形式）で表現する方が, データ構造としてより明確かつ堅牢である場合が多い.
+* **ツール連携**: データ分析ツールの多くは表形式データを中心に設計されており, キーが動的に変わる辞書よりも `table` 形式の方が一般的に扱いやすい.
+* **`data_structure.yml` との整合性**: 物理的なデータ構造を定義する `data_structure.yml` において, キー自体が可変である辞書を具体的に記述することが困難になる.
+
+これらの理由から, ルールの単純さ, 実装の容易さ, データモデリングの明瞭さを優先し, `dictionary` のキーは**固定**とする方針を推奨する.
+
+対象（センサー, 被験者など）に応じてキーが増減するようなデータを表現したい場合は, `format: table` を使用し, 以下のいずれかの方法で定義することを推奨する.
+
+* **可変長列を用いたワイド形式**: [ユースケース: 対象ごとの統計量など](#ユースケース-対象ごとの統計量など) の `sensor_statistics_wide` の例を参照.
+* **固定列を用いたロング形式（正規化）**: [ユースケース: 対象ごとの統計量など](#ユースケース-対象ごとの統計量など) の `sensor_statistics_long` の例を参照.
+
+#### ユースケース: 対象ごとの統計量など
+
+センサーごと, 被験者ごとなど, 対象の数に応じて統計量などをまとめたい場合, `dictionary` の可変長キーではなく, `table` の可変長列を使用する. これにより, いわゆる**ワイド形式**のテーブル構造を表現できる.
+
 ```yaml
 data:
-  ref_single:
-    descriptions: ["単一値"]
-    format: single
+  sensor_ids:
+    descriptions:
+      - 解析対象のセンサーIDリスト
+    format: list
     unit: "-"
-  table_warning:
-    descriptions: ["注意: 参照先 format が single"]
+    # 例: ['sensorA', 'sensorB', 'sensorC']
+
+  sensor_statistics_wide: # ワイド形式の定義
+    descriptions:
+      - 各センサーの統計量 (ワイド形式)
     format: table
-    unit: "table"
+    unit: "table" # 単位は列の description で示す
+    required_data:
+      - sensor_ids
+      # - (元データ)...
+    process:
+      - 元データから sensor_ids に含まれる各センサーの統計量を計算
     columns:
-      - name: time
-        description: "時間"
-      - name: ref_single* # 注意: 参照先 format が single
-        description: "参照先 single"
-        # key_source は不要.
+      - name: statistic # 統計量の種類 (固定列)
+        description: 統計量の種類 (例: 'mean', 'stddev')
+      - name: sensor_ids* # 可変長列. 参照データは 'sensor_ids'
+        description: 各センサーに対応する統計値 (単位は statistic により異なる)
+        # key_source は不要 (sensor_ids の format が list のため)
 ```
+
+この定義 (sensor_statistics_wide) により, データは以下のようなワイド形式のテーブルとして扱われる.
+
+| statistic | sensorA | sensorB | sensorC |
+| --------- | ------- | ------- | ------- |
+| mean      | 10.5    | 11.2    | 9.8     |
+| stddev    | 1.2     | 1.5     | 1.1     |
+
+代替: 正規化されたロング形式
+
+同じ情報を, 正規化されたロング形式のテーブルとして表現することも可能である. この場合, 可変長列は使用しない.
+
+```yaml
+data:
+  sensor_statistics_long: # ロング形式の定義
+    descriptions:
+      - 各センサーの統計量 (正規化されたロング形式)
+    format: table
+    unit: "table" # value 列の単位は statistic により異なる
+    # required_data, process...
+    columns:
+      - name: sensor_id
+        description: センサーID (文字列)
+      - name: statistic
+        description: 統計量の種類 (文字列, 例: 'mean', 'stddev')
+      - name: value
+        description: 統計値 (単位は statistic により異なる)
+```
+
+この定義 (sensor_statistics_long) により, データは以下のようなロング形式のテーブルとして扱われる.
+
+| sensor_id | statistic | value |
+| --------- | --------- | ----- |
+| sensorA   | mean      | 10.5  |
+| sensorA   | stddev    | 1.2   |
+| sensorB   | mean      | 11.2  |
+| sensorB   | stddev    | 1.5   |
+| sensorC   | mean      | 9.8   |
+| sensorC   | stddev    | 1.1   |
+
+data_dependencies.yml では, 解析の文脈に応じてどちらの形式でも定義できる. 可変長列機能は, ワイド形式を直接扱いたい場合に有用である.
 
 ## `parameter` セクション
 
