@@ -15,7 +15,7 @@
                 * [例1: 参照データ (`uid`) が `table` 形式の場合](#例1-参照データ-uid-が-table-形式の場合)
                 * [例2: 参照データ (`sensor_ids`) が `list` 形式の場合](#例2-参照データ-sensor_ids-が-list-形式の場合)
                 * [例3: 参照データ (`device_map`) が `dictionary` 形式の場合](#例3-参照データ-device_map-が-dictionary-形式の場合)
-            * [例4: 参照データ (`device_map`) が 上記以外の形式の場合](#例4-参照データ-device_map-が-上記以外の形式の場合)
+            * [例4: 参照データが上記以外の形式の場合](#例4-参照データが上記以外の形式の場合)
     * [`parameter` セクション](#parameter-セクション)
 
 ## 概要
@@ -167,29 +167,31 @@ data:
 
 ### 可変長列数のデータを定義する場合
 
-`data` セクションの `columns` で, 列数が可変となるデータを定義できる.
+`data` セクションの `columns` で, 列数が可変となるデータを定義できる. これは主に, 複数の被験者やセンサーなど, 対象の数によって列数が変わる場合に利用する.
 
 #### 定義方法
 
-* `columns` リスト内で, 可変長部分の開始を示したい列の `name` の末尾にアスタリスク `*` を付加する.
-* アスタリスクを除いた `name` (例: `uid`) は, `data` セクションで定義済みの他のデータ名を指す必要がある. このデータを「参照データ」と呼ぶ.
+1. `format` が `table` のデータ定義内で `columns` を記述する.
+2. `columns` リスト内で, 可変長部分の開始を示したい列の `name` の末尾にアスタリスク `*` を付加する (例: `user_id*`).
+3. アスタリスクを除いた `name` (例: `user_id`) は, `data` セクションで定義済みの他のデータ名を指す必要がある. このデータを「参照データ」と呼ぶ. 存在しないデータ名を指定しないこと.
+4. 参照データの `format` が `table` の場合のみ, `key_source` キーが必須となる. `key_source` には, 参照データ (`table` 形式) の中で, 実際の列名として使用したい値が含まれる列の名前を指定する (例: `id`). 指定した列が参照データに存在することを確認すること.
+5. 参照データの `format` が `table` 以外の場合は `key_source` を指定しないこと.
 
 #### 列名の決定ルール
 
 可変長部分の実際の列名は, 参照データの `format` によって決定方法が異なる.
 
 * **参照データの `format` が `table` の場合:**
-    * `key_source` キーが必須となる.
-    * `key_source` には, 参照データ (`table` 形式) の中で, 実際の列名として使用したい列の名前を指定する.
-    * 指定された列 (例: `uid` テーブルの `id` 列) の値が, 可変長部分の列名となる.
+    * `key_source` で指定された列の値が, 可変長部分の列名となる.
+    * 例: 参照データ `uid` (`format: table`) の `key_source: id` と指定した場合, `uid` テーブルの `id` 列の値 (`user001`, `user002`, ...) が列名になる.
 * **参照データの `format` が `dictionary` の場合:**
-    * `key_source` キーは不要 (指定しても無視される).
     * 参照データのキーが, 可変長部分の列名となる.
+    * 例: 参照データ `device_map` (`format: dictionary`) を指定した場合, `device_map` のキー (`device1`, `device2`, ...) が列名になる.
 * **参照データの `format` が `list` の場合:**
-    * `key_source` キーは不要 (指定しても無視される).
     * 参照データに含まれる値そのものが, 可変長部分の列名となる.
+    * 例: 参照データ `sensor_ids` (`format: list`) を指定した場合, `sensor_ids` の要素 (`sensorA`, `sensorB`, ...) が列名になる.
 * **上記以外の `format` (`single`, `binary`, `document` など) の場合:**
-    * これらの形式は通常, 可変長列の列名を生成するための参照元としては使用されない. もし参照元として指定された場合の挙動は未定義またはエラーとするのが適切である.
+    * これらの形式を参照データとして指定すること自体は可能だが, 通常, 列名の参照元としては不適切であるため, 意図した動作か確認が必要となる.
 
 #### YAML 記述例
 
@@ -203,7 +205,7 @@ data:
     format: table
     unit: "table"
     columns:
-      - name: id
+      - name: id # この列の値が列名になる
         description: ユーザーID (文字列)
       - name: group
         description: 所属グループ (文字列)
@@ -211,13 +213,13 @@ data:
     descriptions:
       - 実験結果
     format: table
-    unit: "-"
+    unit: "table" # 各列の単位は description で示す想定
     columns:
       - name: time
         description: 経過時間 (s)
       - name: uid* # 可変長列. 参照データは 'uid'
-        description: 各ユーザーの計測値 (mV)
-        key_source: id # 'uid' テーブルの 'id' 列の値を列名として使用
+        description: 各ユーザーの計測値 (mV) # 単位を追記
+        key_source: id # 'uid' テーブルの 'id' 列の値を列名として使用 (必須)
 ```
 
 この場合, `experiment_data` の列は `time`, `user001`, `user002`, ... のようになる (もし `uid` テーブルの `id` 列に `user001`, `user002` が含まれていれば).
@@ -236,13 +238,13 @@ data:
     descriptions:
       - センサー計測値
     format: table
-    unit: "value_unit"
+    unit: "table" # 各列の単位は description で示す想定
     columns:
       - name: timestamp
         description: 計測時刻 (iso8601)
       - name: sensor_ids* # 可変長列. 参照データは 'sensor_ids'
-        description: 各センサーの計測値 (value_unit)
-        # key_source は不要 (sensor_ids の format が list のため)
+        description: 各センサーの計測値 (V) # 単位を追記
+        # key_source は不要 (sensor_ids の format が list のため).
 ```
 
 この場合, `sensor_readings` の列は `timestamp`, `sensorA`, `sensorB`, ... のようになる (もし `sensor_ids` リストに `'sensorA'`, `'sensorB'` が含まれていれば).
@@ -261,21 +263,38 @@ data:
     descriptions:
       - デバイスのステータス
     format: table
-    unit: "-"
+    unit: "table" # 各列の単位は description で示す想定
     columns:
       - name: check_time
         description: 確認時刻 (iso8601)
       - name: device_map* # 可変長列. 参照データは 'device_map'
         description: 各デバイスのステータス (OK/NG/...)
-        # key_source は不要 (device_map の format が dictionary のため)
+        # key_source は不要 (device_map の format が dictionary のため).
 ```
 
 この場合, `device_status` の列は `check_time`, `device1`, `device2`, ... のようになる (もし `device_map` 辞書のキーに `device1`, `device2` が含まれていれば).
 
-#### 例4: 参照データ (`device_map`) が 上記以外の形式の場合
+#### 例4: 参照データが上記以外の形式の場合
 
-参照データの `format` が `single`, `binary`, `document` などの場合, 可変長列の列名を生成するための参照元としては使用しないことが望ましい.
-もし参照元として指定された場合の挙動は未定義またはエラーとするのが適切である.
+参照データの `format` が `single`, `binary`, `document` などの場合, 可変長列の参照元として指定することは推奨されない.
+
+```yaml
+data:
+  ref_single:
+    descriptions: ["単一値"]
+    format: single
+    unit: "-"
+  table_warning:
+    descriptions: ["注意: 参照先 format が single"]
+    format: table
+    unit: "table"
+    columns:
+      - name: time
+        description: "時間"
+      - name: ref_single* # 注意: 参照先 format が single
+        description: "参照先 single"
+        # key_source は不要.
+```
 
 ## `parameter` セクション
 
