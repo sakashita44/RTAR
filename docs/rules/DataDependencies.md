@@ -3,20 +3,20 @@
 `data_dependencies.yml` の記述ルール
 
 * [Data Dependencies Rule](#data-dependencies-rule)
-    * [概要](#概要)
-    * [全体構造](#全体構造)
-    * [`metadata` セクション](#metadata-セクション)
-    * [`target` セクション](#target-セクション)
-    * [`data` セクション](#data-セクション)
-        * [可変長列数のデータを定義する場合](#可変長列数のデータを定義する場合)
-            * [定義方法](#定義方法)
-            * [列名の決定ルール](#列名の決定ルール)
-            * [YAML 記述例](#yaml-記述例)
-                * [例1: 参照データ (`uid`) が `table` 形式の場合](#例1-参照データ-uid-が-table-形式の場合)
-                * [例2: 参照データ (`sensor_ids`) が `list` 形式の場合](#例2-参照データ-sensor_ids-が-list-形式の場合)
-                * [例3: 参照データ (`device_map`) が `dictionary` 形式の場合](#例3-参照データ-device_map-が-dictionary-形式の場合)
-            * [例4: 参照データ (`device_map`) が 上記以外の形式の場合](#例4-参照データ-device_map-が-上記以外の形式の場合)
-    * [`parameter` セクション](#parameter-セクション)
+  * [概要](#概要)
+  * [全体構造](#全体構造)
+  * [`metadata` セクション](#metadata-セクション)
+  * [`target` セクション](#target-セクション)
+  * [`data` セクション](#data-セクション)
+    * [可変長列数のデータを定義する場合](#可変長列数のデータを定義する場合)
+      * [定義方法](#定義方法)
+      * [列名の決定ルール](#列名の決定ルール)
+      * [YAML 記述例](#yaml-記述例)
+        * [例1: 参照データ (`uid`) が `table` 形式の場合](#例1-参照データ-uid-が-table-形式の場合)
+        * [例2: 参照データ (`sensor_ids`) が `list` 形式の場合](#例2-参照データ-sensor_ids-が-list-形式の場合)
+        * [例3: 参照データ (`device_map`) が `dictionary` 形式の場合](#例3-参照データ-device_map-が-dictionary-形式の場合)
+      * [例4: 参照データ (`device_map`) が 上記以外の形式の場合](#例4-参照データ-device_map-が-上記以外の形式の場合)
+  * [`parameter` セクション](#parameter-セクション)
 
 ## 概要
 
@@ -104,7 +104,13 @@ required_data や required_parameter で他のデータやパラメータとの�
         * `single`: 単一の値.
         * `binary`: 画像, 音声, C3D など特定の構造を持つバイナリデータ.
         * `document`: テキスト中心の文書 (プレーンテキスト, HTML, XML など).
-    * `unit` (必須): データの単位を示す文字列. 単位がない場合や `table`, `dictionary` 形式などデータ全体で単一の単位を定義できない場合は `-` を記述する.
+    * `unit` (必須): データの単位を示す文字列 (自由記述).
+        * `binary`, `document`他, 単位がない場合は`-`
+        * `table` 形式の場合は `table` を指定し, `columns` で各列の単位を指定する.
+        * `dictionary` 形式の場合は各キーの値に対して単位を指定することが望ましい
+            * 例: `key1:unit1, key2:unit2`
+        * `list` 形式の場合すべての要素の単位が同一になるはずなので, 単位を一つだけ指定する (例: `unit1`).
+        * `single` 形式の場合は単位を一つだけ指定する (例: `unit1`).
     * `columns` (任意): データが `table` 形式の場合に列情報を定義するリスト. `format` が `table` の場合は必須.
         * `name` (必須): 列名 (文字列).
             * 列名の末尾に `*` を付けると, その列以降が可変長であることを示す. 詳細は[可変長列数のデータを定義する場合](#可変長列数のデータを定義する場合)を参照.
@@ -130,8 +136,8 @@ data:
   dataA:
     descriptions:
       - 説明1
-    format: table # time_series は table に含める
-    unit: mV
+    format: table
+    unit: "table"
     required_data: # 依存データ
       - rawA
     required_parameter: # 依存パラメータ
@@ -139,6 +145,24 @@ data:
     process: # 処理手順
       - rawA から不要な列を削除
       - parameter1 を用いてフィルタリング
+    columns:
+        - name: time
+          description: 時間 (s)
+        - name: value
+          description: 計測値 (mV)
+  dataB:
+    descriptions:
+      - "key1: value1, key2:value2 のような辞書形式のデータ"
+    format: dictionary # 辞書形式
+    unit: "key1:unit1, key2:unit2" # 辞書のキーに対する単位(自由記述)
+    required_data:
+      - rawA
+    required_parameter:
+      - parameter2
+    process:
+      - rawA から必要なデータを抽出
+      - parameter2 を用いて変換
+    # dictionary の場合は columns は不要
 ```
 
 ### 可変長列数のデータを定義する場合
