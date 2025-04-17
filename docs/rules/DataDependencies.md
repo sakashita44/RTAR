@@ -3,20 +3,20 @@
 `data_dependencies.yml` の記述ルール
 
 * [Data Dependencies Rule](#data-dependencies-rule)
-  * [概要](#概要)
-  * [全体構造](#全体構造)
-  * [`metadata` セクション](#metadata-セクション)
-  * [`target` セクション](#target-セクション)
-  * [`data` セクション](#data-セクション)
-    * [可変長列数のデータを定義する場合](#可変長列数のデータを定義する場合)
-      * [定義方法](#定義方法)
-      * [列名の決定ルール](#列名の決定ルール)
-      * [YAML 記述例](#yaml-記述例)
-        * [例1: 参照データ (`uid`) が `table` 形式の場合](#例1-参照データ-uid-が-table-形式の場合)
-        * [例2: 参照データ (`sensor_ids`) が `list` 形式の場合](#例2-参照データ-sensor_ids-が-list-形式の場合)
-        * [例3: 参照データ (`device_map`) が `dictionary` 形式の場合](#例3-参照データ-device_map-が-dictionary-形式の場合)
-      * [例4: 参照データ (`device_map`) が 上記以外の形式の場合](#例4-参照データ-device_map-が-上記以外の形式の場合)
-  * [`parameter` セクション](#parameter-セクション)
+    * [概要](#概要)
+    * [全体構造](#全体構造)
+    * [`metadata` セクション](#metadata-セクション)
+    * [`target` セクション](#target-セクション)
+    * [`data` セクション](#data-セクション)
+        * [可変長列数のデータを定義する場合](#可変長列数のデータを定義する場合)
+            * [定義方法](#定義方法)
+            * [列名の決定ルール](#列名の決定ルール)
+            * [YAML 記述例](#yaml-記述例)
+                * [例1: 参照データ (`uid`) が `table` 形式の場合](#例1-参照データ-uid-が-table-形式の場合)
+                * [例2: 参照データ (`sensor_ids`) が `list` 形式の場合](#例2-参照データ-sensor_ids-が-list-形式の場合)
+                * [例3: 参照データ (`device_map`) が `dictionary` 形式の場合](#例3-参照データ-device_map-が-dictionary-形式の場合)
+            * [例4: 参照データ (`device_map`) が 上記以外の形式の場合](#例4-参照データ-device_map-が-上記以外の形式の場合)
+    * [`parameter` セクション](#parameter-セクション)
 
 ## 概要
 
@@ -127,7 +127,7 @@ data:
       - 説明1
       - 説明2
     format: table # データ形式
-    unit: "-" # 単位 (テーブルなので `-`)
+    unit: "table" # 単位 (テーブルなので `table`)
     columns: # table 形式の場合必須
       - name: time # 列名
         description: 時間 (s) # 列の説明 (単位含む)
@@ -201,7 +201,7 @@ data:
     descriptions:
       - ユーザー情報
     format: table
-    unit: "-"
+    unit: "table"
     columns:
       - name: id
         description: ユーザーID (文字列)
