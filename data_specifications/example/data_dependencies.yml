@@ -1,0 +1,195 @@
+# data_dependencies.yml
+metadata:
+  title: "センサーデータの前処理と統計量算出"
+  purposes:
+    - "生センサーデータからノイズを除去し、整形する"
+    - "整形済みデータから基本的な統計量を計算する"
+    - "処理プロセスにおけるデータ依存関係を明確にする"
+    - "ユーザーごとの統計量を算出する"
+  terms:
+    - name: "用語1"
+      descriptions:
+        - "用語1の説明"
+    - name: "用語2"
+      descriptions:
+        - "用語2の説明"
+  note:
+    - "パラメータ 'filter_threshold' の値は実験的に決定される"
+
+target:
+  - statistics_summary # 最終的に生成したいデータ
+  - user_specific_summary # 追加: 可変長データの例
+  - analysis_report # 追加: document 形式の例
+  - processed_image # 追加: binary 形式の例
+  - calculated_threshold # 追加: single 形式の例
+
+data:
+  raw_sensor_data:
+    descriptions:
+      - "センサーAから取得した生の時間変化データ"
+    format: table
+    unit: "table"
+    columns:
+      - name: timestamp
+        description: "データ取得時刻 (ISO 8601形式)"
+      - name: value_raw
+        description: "センサーの生出力値 (mV)"
+      - name: status_flag
+        description: "データ品質フラグ (0:正常, 1:異常)"
+
+  processed_data:
+    descriptions:
+      - "生データから異常フラグを除外し、単位を変換したデータ"
+    format: table # 変更: time_series は table に含める
+    unit: "table" # mVからVに変換
+    required_data:
+      - raw_sensor_data
+    required_parameter:
+      - conversion_factor
+    process:
+      - "'raw_sensor_data' から 'status_flag' が 0 のレコードのみ抽出"
+      - "'value_raw' 列に 'conversion_factor' を乗じて単位を V に変換"
+      - "'timestamp' 列と変換後の値でテーブルデータを作成" # 変更: 時系列データ -> テーブルデータ
+    columns:
+      - name: timestamp
+        description: "データ取得時刻 (ISO 8601形式)"
+      - name: value
+        description: "処理済みセンサー値 (V)"
+
+  filtered_data:
+    descriptions:
+      - "整形済みデータにフィルタを適用したデータ"
+    format: table
+    unit: "table"
+    required_data:
+      - processed_data
+    required_parameter:
+      - filter_threshold
+    process:
+      - "'processed_data' に対して、'filter_threshold' を用いて平滑化フィルタを適用"
+    columns:
+      - name: timestamp
+        description: "データ取得時刻 (ISO 8601形式)"
+      - name: value_filtered
+        description: "フィルタ適用済みセンサー値 (V)"
+
+  statistics_summary:
+    descriptions:
+      - "フィルタ適用済みデータの基本的な統計量"
+    format: dictionary
+    unit: "dictionary"
+    keys:
+      - name: mean
+        description: "平均値"
+      - name: stddev
+        description: "標準偏差"
+    required_data:
+      - filtered_data
+    process:
+      - "'filtered_data' の値の平均値と標準偏差を計算"
+      - "結果を辞書データとしてまとめる (例: {'mean': X, 'stddev': Y})"
+
+  # --- 可変長データの例を追加 ---
+  user_ids:
+    descriptions:
+      - "解析対象のユーザーIDリスト"
+    format: list
+    unit: "-"
+    # 例: ['user001', 'user002', 'user003']
+
+  user_specific_summary:
+    descriptions:
+      - "ユーザーごとのフィルタ適用済みデータの統計量 (例: 平均値)"
+    format: table
+    unit: "table"
+    required_data:
+      - filtered_data
+      - user_ids # ユーザーIDリストに依存
+    process:
+      - "'filtered_data' をユーザーごとに分割 (別途ユーザー情報が必要と仮定)"
+      - "各ユーザーのデータについて平均値を計算"
+      - "結果を時間とユーザーIDを列とするテーブルにまとめる"
+    columns:
+      - name: timestamp # 例として時間軸も保持
+        description: "集計時刻 (ISO 8601形式)"
+      - name: user_ids* # 可変長列. 参照データは 'user_ids' (format: list)
+        description: "各ユーザーの統計値 (V)"
+        # key_source は不要 (参照データ user_ids の format が list のため)
+
+  # --- single 形式の例 ---
+  calculated_threshold:
+    descriptions:
+      - "統計量から計算された単一の閾値"
+    format: single
+    unit: "V" # 例: 統計量と同じ単位
+    required_data:
+      - statistics_summary
+    process:
+      - "'statistics_summary' の平均値と標準偏差から閾値を計算 (例: mean + 2*stddev)"
+
+  # --- binary 形式の例 ---
+  raw_image:
+    descriptions:
+      - "実験セットアップの画像データ"
+    format: binary
+    unit: "-" # 画像ファイル自体に単位はない
+    # required_data や process は状況に応じて定義
+
+  processed_image:
+    descriptions:
+      - "特定の領域を切り出した画像データ"
+    format: binary
+    unit: "-"
+    required_data:
+      - raw_image
+    required_parameter:
+      - roi_top
+      - roi_bottom
+      - roi_left
+      - roi_right
+    process:
+      - "'raw_image' から 'roi_top', 'roi_bottom', 'roi_left', 'roi_right' に基づいて関心領域を切り出す"
+
+  # --- document 形式の例 ---
+  analysis_report:
+    descriptions:
+      - "解析結果をまとめたレポートファイル (例: Markdown, PDF)"
+    format: document
+    unit: "-"
+    required_data:
+      - statistics_summary
+      - user_specific_summary
+      - processed_image # レポートに画像を含める場合
+    process:
+      - "各種解析結果をテンプレートに埋め込み、レポートファイルを生成する"
+
+parameter:
+  conversion_factor:
+    descriptions:
+      - "センサー出力値 (mV) を電圧 (V) に変換するための係数"
+    unit: "V/mV" # 単位を明記
+
+  filter_threshold:
+    descriptions:
+      - "平滑化フィルタの閾値、またはカットオフ周波数など"
+    unit: "-" # フィルタの種類によって単位が変わるため、ここではハイフン
+
+  roi_top: # 画像から切り出す関心領域の上端
+    descriptions:
+      - "関心領域 (Region of Interest) の上端の座標"
+    unit: "pixel"
+
+  roi_bottom: # 画像から切り出す関心領域の下端
+    descriptions:
+      - "関心領域 (Region of Interest) の下端の座標"
+    unit: "pixel"
+
+  roi_left: # 画像から切り出す関心領域の左端
+    descriptions:
+      - "関心領域 (Region of Interest) の左端の座標"
+    unit: "pixel"
+
+  roi_right: # 画像から切り出す関心領域の右端
+    descriptions:
+      - "関心領域 (Region of Interest) の右端の座標"
+    unit: "pixel"
