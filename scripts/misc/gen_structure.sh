@@ -54,11 +54,6 @@ for file in "${!paramFiles[@]}"; do
     fi
 done
 
-# 情報ファイルのテンプレート作成
-declare -A infoFiles
-infoFiles["info/PROCESS_OVERVIEW.md"]="# 処理経路概要\n\nこのドキュメントでは, データ処理のフローと手順を記録する.\n\n## 処理フロー\n\n\`\`\`mermaid\ngraph TD\n  A[生データ] --> B[前処理]\n  B --> C[解析]\n  C --> D[出力]\n\`\`\`"
-infoFiles["info/VERSION_MAPPING.md"]="# バージョン対応表\n\nこのドキュメントでは, コードとデータのバージョン対応を記録する.\n\n| バージョン | 日付 | 説明 | コミット | データハッシュ |\n|----------|------|------|---------|------------|\n| v0.1.0   | YYYY-MM-DD | 初期設定 | - | - |"
-
 for file in "${!infoFiles[@]}"; do
     if [ ! -f "$file" ]; then
         echo -e "${infoFiles[$file]}" > "$file"
