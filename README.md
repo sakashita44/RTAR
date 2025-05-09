@@ -1,4 +1,6 @@
-# rtar (Reproducible and Traceable Analysis for Research)
+# rtar-core
+
+Reproducible and Traceable Analysis for Research
 
 ## 概要
 
