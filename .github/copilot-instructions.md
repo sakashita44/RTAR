@@ -42,6 +42,7 @@ Therefore, user needs you to explain structure of the code, frameworks and libra
 * Don't use meanless headings
 * Add back quotes for code and names
 * Use 4 spaces for tab
+* Add 1 space after list marker and `#` (not 3 spaces)
 
 ### Git rules
 
